@@ -3,6 +3,7 @@ import vue from "eslint-plugin-vue";
 import vueParser from "vue-eslint-parser";
 import prettierConfig from "eslint-config-prettier";
 import tseslint from "typescript-eslint";
+import globals from "globals";
 
 export default [
   {
@@ -19,6 +20,10 @@ export default [
         ecmaVersion: "latest",
         sourceType: "module",
       },
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
     },
   },
   {
@@ -30,6 +35,10 @@ export default [
         sourceType: "module",
         parser: tseslint.parser,
         extraFileExtensions: [".vue"],
+      },
+      globals: {
+        ...globals.browser,
+        ...globals.node,
       },
     },
     plugins: {
