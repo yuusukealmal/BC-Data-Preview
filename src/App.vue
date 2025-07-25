@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
-import type { List } from "./types";
+import type { List } from "./types/index";
 import { aesECBDecrypt } from "./utils/crypto/decrypt";
 
 import Manger from "./components/Manger.vue";

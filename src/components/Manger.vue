@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, type PropType } from "vue";
-import type { List } from "../types";
+import type { List } from "../types/index";
 import { aesCBCDecrypt } from "../utils/crypto/decrypt";
 
 const props = defineProps({

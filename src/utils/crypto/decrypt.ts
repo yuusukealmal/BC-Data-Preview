@@ -1,6 +1,6 @@
 import * as CryptoJS from "crypto-js";
 
-import type { countryCode, fileInfo } from "../../types";
+import type { countryCode, fileInfo } from "../../types/index";
 import { ECBKey, CBCKey } from "../../config/config";
 
 const crop = (buffer: ArrayBuffer, info: fileInfo) => {
