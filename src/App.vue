@@ -74,7 +74,6 @@ const handleInputChange = async (e: Event) => {
     <main class="main-content">
       <div v-if="list && pack && selectedCC">
         <Manger :list="list" :pack="pack" :cc="selectedCC" />
-        <Preview />
       </div>
       <div v-else class="welcome">
         <p>選擇檔案</p>
