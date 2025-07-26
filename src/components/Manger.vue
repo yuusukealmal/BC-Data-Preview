@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, type PropType } from "vue";
-import type { List } from "../types/index";
+import type { countryCode, List } from "../types/index";
 import { aesCBCDecrypt } from "../utils/crypto/decrypt";
 
 const props = defineProps({
@@ -13,7 +13,7 @@ const props = defineProps({
     required: true,
   },
   cc: {
-    type: String,
+    type: String as PropType<countryCode>,
     required: true,
   },
 });
@@ -37,7 +37,7 @@ const selectFile = (idx: number) => {
 
   if (file.name.endsWith(".png")) {
     isImage.value = true;
-    const blob = new Blob([data as Uint8Array], { type: "image/png" });
+    const blob = new Blob([data], { type: "image/png" });
     previewImageUrl.value = URL.createObjectURL(blob);
     previewContent.value = "";
   } else {
@@ -128,5 +128,4 @@ const selectFile = (idx: number) => {
   font-size: 0.875rem;
   color: #888;
 }
-
 </style>

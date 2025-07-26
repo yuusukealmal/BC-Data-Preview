@@ -1,14 +1,21 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref } from "vue";
 
-import type { List } from "./types/index";
+import type { countryCode, List } from "./types/index";
 import { aesECBDecrypt } from "./utils/crypto/decrypt";
 
 import Manger from "./components/Manger.vue";
 
 const list = ref<List | null>(null);
 const pack = ref<ArrayBuffer | null>(null);
-const selectedCC = ref<string | null>(null);
+const selectedCC = ref<countryCode | null>(null);
+
+const countryMap = {
+  JP: "日文版",
+  TW: "中文版",
+  EN: "國際版",
+  KR: "韓文版",
+} as const;
 
 const handleInputChange = async (e: Event) => {
   const file = (e.target as HTMLInputElement).files?.[0];
@@ -39,7 +46,6 @@ const handleInputChange = async (e: Event) => {
     alert("不支持的文件格式");
   }
 };
-
 </script>
 
 <template>
@@ -49,10 +55,9 @@ const handleInputChange = async (e: Event) => {
         <div class="dropdown-wrapper">
           <label for="cc-select">選擇版本：</label>
           <select id="cc-select" v-model="selectedCC">
-            <option value="JP">日文版</option>
-            <option value="EN">國際版</option>
-            <option value="TW">中文版</option>
-            <option value="KR">韓國版</option>
+            <option v-for="(label, code) in countryMap" :key="code" :value="code">
+              {{ label }}
+            </option>
           </select>
         </div>
         <div class="input-group">
