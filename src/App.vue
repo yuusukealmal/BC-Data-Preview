@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 import type { List } from "./types/index";
 import { aesECBDecrypt } from "./utils/crypto/decrypt";
@@ -8,6 +8,7 @@ import Manger from "./components/Manger.vue";
 
 const list = ref<List | null>(null);
 const pack = ref<ArrayBuffer | null>(null);
+const selectedCC = ref<string | null>(null);
 
 const handleInputChange = async (e: Event) => {
   const file = (e.target as HTMLInputElement).files?.[0];
@@ -38,12 +39,22 @@ const handleInputChange = async (e: Event) => {
     alert("不支持的文件格式");
   }
 };
+
 </script>
 
 <template>
   <div class="app">
     <header class="header">
       <div class="input-controls">
+        <div class="dropdown-wrapper">
+          <label for="cc-select">選擇版本：</label>
+          <select id="cc-select" v-model="selectedCC">
+            <option value="JP">日文版</option>
+            <option value="EN">國際版</option>
+            <option value="TW">中文版</option>
+            <option value="KR">韓國版</option>
+          </select>
+        </div>
         <div class="input-group">
           <label>List 文件</label>
           <input type="file" accept=".list" @change="handleInputChange($event)" />
@@ -56,8 +67,8 @@ const handleInputChange = async (e: Event) => {
     </header>
 
     <main class="main-content">
-      <div v-if="list && pack">
-        <Manger :list="list" :pack="pack" />
+      <div v-if="list && pack && selectedCC">
+        <Manger :list="list" :pack="pack" :cc="selectedCC" />
         <Preview />
       </div>
       <div v-else class="welcome">
@@ -120,6 +131,35 @@ const handleInputChange = async (e: Event) => {
 }
 
 .input-group input:focus {
+  outline: none;
+  border-color: #80bdff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.dropdown-wrapper label {
+  font-weight: 500;
+  color: #495057;
+  min-width: 90px;
+  font-size: 16px;
+}
+
+.dropdown-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dropdown-wrapper select {
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  background: white;
+  font-size: 14px;
+  color: #495057;
+  min-width: 150px;
+}
+
+.dropdown-wrapper select:focus {
   outline: none;
   border-color: #80bdff;
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
