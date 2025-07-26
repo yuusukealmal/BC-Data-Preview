@@ -12,6 +12,10 @@ const props = defineProps({
     type: ArrayBuffer as PropType<ArrayBuffer>,
     required: true,
   },
+  cc: {
+    type: String,
+    required: true,
+  },
 });
 
 const selectedFile = ref<string | null>(null);
@@ -28,7 +32,8 @@ const selectFile = (idx: number) => {
     previewImageUrl.value = null;
   }
 
-  const data = aesCBCDecrypt("TW", file, props.pack);
+  console.log("Selected CC:", props.cc);
+  const data = aesCBCDecrypt(props.cc, file, props.pack);
 
   if (file.name.endsWith(".png")) {
     isImage.value = true;
@@ -84,4 +89,44 @@ const selectFile = (idx: number) => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.preview-body {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+}
+
+.file-list {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+}
+
+.file-item {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.file-item:hover {
+  background-color: #f5f5f5;
+}
+
+.file-item.active {
+  background-color: #d0f0ff;
+  font-weight: bold;
+}
+
+.file-name {
+  font-size: 1rem;
+  margin-bottom: 0.2rem;
+}
+
+.file-info {
+  font-size: 0.875rem;
+  color: #888;
+}
+
+</style>
