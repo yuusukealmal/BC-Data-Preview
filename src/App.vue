@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
-import type { countryCode, List } from "./types/index";
-import { aesECBDecrypt } from "./utils/crypto/decrypt";
+import { versions } from "./config/versions";
+import type { countryCode } from "./types/index";
 
 import Manger from "./components/Manger.vue";
 
-const list = ref<List | null>(null);
-const pack = ref<ArrayBuffer | null>(null);
 const selectedCC = ref<countryCode | null>(null);
+const selectedVersion = ref<string | null>(null);
 
 const countryMap = {
   JP: "日文版",
@@ -16,36 +15,6 @@ const countryMap = {
   EN: "國際版",
   KR: "韓文版",
 } as const;
-
-const handleInputChange = async (e: Event) => {
-  const file = (e.target as HTMLInputElement).files?.[0];
-  if (!file) {
-    return;
-  }
-
-  if (file.name.endsWith(".list")) {
-    const listResult = aesECBDecrypt(await file.arrayBuffer());
-
-    list.value = {
-      name: file.name.split(".")[0],
-      files: listResult
-        .split("\n")
-        .slice(1, -1)
-        .map((item) => {
-          const [name, start, offset] = item.split(",");
-          return {
-            name,
-            start: Number(start),
-            offset: Number(offset),
-          };
-        }),
-    };
-  } else if (file.name.endsWith(".pack")) {
-    pack.value = await file.arrayBuffer();
-  } else {
-    alert("不支持的文件格式");
-  }
-};
 </script>
 
 <template>
@@ -54,26 +23,23 @@ const handleInputChange = async (e: Event) => {
       <div class="input-controls">
         <div class="dropdown-wrapper">
           <label for="cc-select">選擇版本：</label>
-          <select id="cc-select" v-model="selectedCC">
+          <select id="cc-select" v-model="selectedCC" @change="selectedVersion = null">
             <option v-for="(label, code) in countryMap" :key="code" :value="code">
               {{ label }}
             </option>
           </select>
-        </div>
-        <div class="input-group">
-          <label>List 文件</label>
-          <input type="file" accept=".list" @change="handleInputChange($event)" />
-        </div>
-        <div class="input-group">
-          <label>Pack 文件</label>
-          <input type="file" accept=".pack" @change="handleInputChange($event)" />
+          <select v-if="selectedCC" id="cc-select" v-model="selectedVersion">
+            <option v-for="version in versions[selectedCC]" :key="version" :value="version">
+              {{ version }}
+            </option>
+          </select>
         </div>
       </div>
     </header>
 
     <main class="main-content">
-      <div v-if="list && pack && selectedCC">
-        <Manger :list="list" :pack="pack" :cc="selectedCC" />
+      <div v-if="selectedCC && selectedVersion">
+        <Manger :cc="selectedCC" :version="selectedVersion" />
       </div>
       <div v-else class="welcome">
         <p>選擇檔案</p>

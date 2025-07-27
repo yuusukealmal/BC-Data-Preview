@@ -7,6 +7,7 @@ export interface fileInfo {
 }
 
 export interface List {
-  name: string;
   files: fileInfo[];
 }
+
+export type fileType = "DataLocal" | "DownloadLocal" | "ImageDataLocal" | "ImageLocal" | "MapLocal" | "NumberLocal" | "resLocal" | "UnitLocal";
