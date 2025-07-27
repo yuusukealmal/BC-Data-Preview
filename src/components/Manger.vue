@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, type PropType, computed, watch } from "vue";
+import { ref, type PropType, watch } from "vue";
 import type { countryCode, List, fileType } from "../types/index";
 import { aesCBCDecrypt, aesECBDecrypt } from "../utils/crypto/decrypt";
 
@@ -108,7 +108,7 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
         <span class="file-count">{{ list?.files?.length || 0 }} 個文件</span>
       </div>
       <div class="file-list">
-        <div v-if="list?.files?.length" v-for="(file, idx) in list.files" :key="file.name" class="file-item" :class="{ active: selectedFile === file.name }" @click="selectFile(idx)">
+        <div v-for="(file, idx) in list.files" v-if="list?.files?.length" :key="file.name" class="file-item" :class="{ active: selectedFile === file.name }" @click="selectFile(idx)">
           <div>
             <div class="file-name">{{ file.name }}</div>
             <div class="file-info">起始位置: {{ file.start }} | 大小: {{ file.offset }}</div>
