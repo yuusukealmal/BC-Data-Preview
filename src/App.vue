@@ -48,7 +48,7 @@ const toggleTheme = () => {
             </option>
           </select>
           <select v-if="selectedCC" v-model="selectedVersion">
-            <option v-if="versions[selectedCC].length > 0" v-for="version in versions[selectedCC]" :key="version" :value="version">
+            <option v-for="version in versions[selectedCC]" v-if="versions[selectedCC].length > 0" :key="version" :value="version">
               {{ version }}
             </option>
             <option v-else value="null">無版本可以選擇</option>
