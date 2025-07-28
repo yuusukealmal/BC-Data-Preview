@@ -147,8 +147,8 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
 <style scoped>
 .file-type-selector {
   padding: 16px 24px;
-  background: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   gap: 12px;
@@ -156,22 +156,29 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
 
 .file-type-selector label {
   font-weight: 500;
-  color: #495057;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
 .file-type-selector select {
   padding: 6px 12px;
-  border: 1px solid #ced4da;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
-  background: white;
+  background: var(--bg-primary);
   font-size: 14px;
-  color: #495057;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+.file-type-selector select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px var(--accent-color-alpha);
 }
 
 .selected-type {
-  background: #d4edda;
-  color: #155724;
+  background: var(--success-bg);
+  color: var(--success-text);
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 12px;
@@ -181,121 +188,128 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
 .no-files {
   padding: 24px;
   text-align: center;
-  color: #6c757d;
+  color: var(--text-muted);
 }
 
 .manager {
   display: flex;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-lg);
+  background: var(--bg-primary);
 }
 
 .sidebar {
   width: 50%;
-  border-right: 2px solid #e9ecef;
+  border-right: 2px solid var(--border-color);
   display: flex;
   flex-direction: column;
+  background: var(--bg-primary);
 }
 
 .sidebar-header {
   padding: 24px;
-  border-bottom: 2px solid #e9ecef;
+  border-bottom: 2px solid var(--border-color);
   display: flex;
   justify-content: space-between;
+  background: var(--bg-secondary);
 }
 
 .sidebar-header h3 {
   margin: 0;
-  color: #333;
+  color: var(--text-primary);
   font-size: 20px;
 }
 
 .preview-body {
   max-height: 400px;
   overflow-y: auto;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
+  background: var(--bg-primary);
 }
 
 .file-count {
-  background: #e9ecef;
+  background: var(--bg-tertiary);
   padding: 6px 12px;
   border-radius: 16px;
   font-size: 14px;
-  color: #6c757d;
+  color: var(--text-muted);
 }
 
 .file-list {
   max-height: 400px;
   overflow-y: auto;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
   padding: 0.5rem;
+  background: var(--bg-primary);
 }
 
 .file-item {
-  padding: 16px;
   padding: 0.75rem 1rem;
   border: 2px solid transparent;
   border-radius: 10px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-light);
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.3s ease;
+  background: var(--bg-primary);
 }
 
 .file-item:hover {
-  background-color: #f5f5f5;
-  border-color: #cce7ff;
+  background: var(--bg-hover);
+  border-color: var(--accent-color-light);
   transform: translateX(6px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .file-item.active {
-  background-color: #d0f0ff;
+  background: var(--accent-bg);
   font-weight: bold;
-  border-color: #2196f3;
-  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+  border-color: var(--accent-color);
+  box-shadow: var(--shadow-accent);
 }
 
 .file-name {
   font-size: 1rem;
   margin-bottom: 0.2rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   overflow: hidden;
 }
 
 .file-info {
   font-size: 0.875rem;
-  color: #888;
+  color: var(--text-secondary);
 }
 
 .preview-section {
   width: 50%;
   display: flex;
   flex-direction: column;
+  background: var(--bg-primary);
 }
 
 .preview-header {
   padding: 24px;
-  border-bottom: 2px solid #e9ecef;
+  border-bottom: 2px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: var(--bg-secondary);
 }
 
 .preview-header h3 {
   margin: 0;
-  color: #333;
+  color: var(--text-primary);
   font-size: 20px;
   font-weight: 600;
 }
 
 .selected-info {
-  background: #e8f5e8;
+  background: var(--success-bg);
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 14px;
-  color: #2e7d32;
+  color: var(--success-text);
   font-weight: 500;
 }
 
@@ -304,14 +318,22 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
   padding: 24px;
   overflow: auto;
   display: flex;
-  color: black;
+  color: var(--text-primary);
   justify-content: start;
   align-items: start;
+  background: var(--bg-primary);
 }
 
 .image-preview {
   justify-content: center;
   align-items: center;
+}
+
+.image-preview img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
 }
 
 .preview-body {
@@ -320,6 +342,55 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
   min-height: 300px;
   font-size: 14px;
   line-height: 1.6;
-  border: 2px solid #e9ecef;
+  border: 2px solid var(--border-color);
+  background: var(--bg-primary);
+}
+
+.preview-body pre {
+  color: var(--text-primary);
+  background: var(--bg-code);
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: "Courier New", monospace;
+  border: 1px solid var(--border-color);
+}
+
+.file-list::-webkit-scrollbar,
+.preview-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.file-list::-webkit-scrollbar-track,
+.preview-body::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+}
+
+.file-list::-webkit-scrollbar-thumb,
+.preview-body::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+
+.file-list::-webkit-scrollbar-thumb:hover,
+.preview-body::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+@media (max-width: 768px) {
+  .manager {
+    flex-direction: column;
+  }
+
+  .sidebar,
+  .preview-section {
+    width: 100%;
+  }
+
+  .sidebar {
+    border-right: none;
+    border-bottom: 2px solid var(--border-color);
+  }
 }
 </style>
