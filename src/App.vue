@@ -32,7 +32,7 @@ const countryMap = {
 
 const toggleTheme = () => {
   isDark.value = !isDark.value;
-  applyTheme(isDark.value);
+  // applyTheme(isDark.value);
 };
 </script>
 
