@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 import { versions } from "./config/versions";
 import type { countryCode } from "./types/index";
@@ -29,6 +29,10 @@ const countryMap = {
   EN: "國際版",
   KR: "韓文版",
 } as const;
+const countryVersions = computed(() => {
+  if (!selectedCC.value) return [];
+  return versions[selectedCC.value]?.length > 0 ? versions[selectedCC.value] : [null];
+});
 
 const toggleTheme = () => {
   isDark.value = !isDark.value;
@@ -48,10 +52,9 @@ const toggleTheme = () => {
             </option>
           </select>
           <select v-if="selectedCC" v-model="selectedVersion">
-            <option v-for="version in versions[selectedCC]" v-if="versions[selectedCC].length > 0" :key="version" :value="version">
-              {{ version }}
+            <option v-for="version in countryVersions" :key="version || 'none'" :value="version">
+              {{ version !== null ? version : "無版本可以選擇" }}
             </option>
-            <option v-else value="null">無版本可以選擇</option>
           </select>
           <select v-else></select>
         </div>
