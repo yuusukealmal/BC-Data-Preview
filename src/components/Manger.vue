@@ -93,19 +93,19 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
 </script>
 
 <template>
-  <div class="file-type-selector">
-    <label for="file-type-select">文件類型：</label>
-    <select id="file-type-select" v-model="selectedFileType">
+  <div class="file-type-selector select-wrapper">
+    <span>文件類型：</span>
+    <select v-model="selectedFileType">
       <option v-for="fileType in fileTypesList" :key="fileType" :value="fileType">
         {{ fileType }}
       </option>
     </select>
   </div>
-  <div class="manager">
-    <aside class="sidebar">
-      <div class="sidebar-header">
+  <div class="wrapper">
+    <section>
+      <div class="header">
         <h3>文件列表</h3>
-        <span class="file-count">{{ list?.files?.length || 0 }} 個文件</span>
+        <span class="detail-info">{{ list?.files?.length || 0 }} 個文件</span>
       </div>
       <div class="file-list">
         <div v-for="(file, idx) in list.files" v-if="list?.files?.length" :key="file.name" class="file-item" :class="{ active: selectedFile === file.name }" @click="selectFile(idx)">
@@ -118,12 +118,12 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
           <p>沒有可用的文件</p>
         </div>
       </div>
-    </aside>
+    </section>
 
-    <section class="preview-section">
-      <div class="preview-header">
+    <section>
+      <div class="header">
         <h3>文件預覽</h3>
-        <div v-if="selectedFile" class="selected-info">當前選擇: {{ selectedFile }}</div>
+        <span v-if="selectedFile" class="detail-info">當前選擇: {{ selectedFile }}</span>
       </div>
       <div class="preview-content">
         <div v-if="selectedFile" class="preview">
@@ -136,7 +136,7 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
             </div>
           </div>
         </div>
-        <div v-else>
+        <div v-else class="no-files">
           <p>未選擇文件</p>
         </div>
       </div>
@@ -146,52 +146,14 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
 
 <style scoped>
 .file-type-selector {
-  padding: 16px 24px;
+  padding: 12px;
   background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.file-type-selector label {
-  font-weight: 500;
-  color: var(--text-secondary);
-  font-size: 14px;
-}
-
-.file-type-selector select {
-  padding: 6px 12px;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  background: var(--bg-primary);
-  font-size: 14px;
-  color: var(--text-primary);
-  transition: all 0.3s ease;
-}
-
-.file-type-selector select:focus {
-  outline: none;
-  border-color: var(--accent-color);
-  box-shadow: 0 0 0 2px var(--accent-color-alpha);
-}
-
-.selected-type {
-  background: var(--success-bg);
-  color: var(--success-text);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.no-files {
-  padding: 24px;
-  text-align: center;
-  color: var(--text-muted);
-}
-
-.manager {
+.wrapper {
   display: flex;
   border-radius: 12px;
   overflow: hidden;
@@ -199,58 +161,62 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
   background: var(--bg-primary);
 }
 
-.sidebar {
+section {
   width: 50%;
-  border-right: 2px solid var(--border-color);
+  height: 100vh;
   display: flex;
   flex-direction: column;
   background: var(--bg-primary);
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
-.sidebar-header {
-  padding: 24px;
-  border-bottom: 2px solid var(--border-color);
+.header {
   display: flex;
+  border: 2px solid var(--border-color);
+  padding: 8px 18px;
   justify-content: space-between;
   background: var(--bg-secondary);
 }
 
-.sidebar-header h3 {
-  margin: 0;
+.header h3 {
   color: var(--text-primary);
   font-size: 20px;
 }
 
-.preview-body {
-  max-height: 400px;
-  overflow-y: auto;
-  border: 1px solid var(--border-color);
-  background: var(--bg-primary);
+.detail-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 12px;
+  font-size: 16px;
+  font-weight: 500;
 }
 
-.file-count {
-  background: var(--bg-tertiary);
-  padding: 6px 12px;
-  border-radius: 16px;
-  font-size: 14px;
+.no-files {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  padding: 24px;
+  justify-content: center;
+  align-items: center;
   color: var(--text-muted);
 }
 
 .file-list {
-  max-height: 400px;
+  flex: 1;
   overflow-y: auto;
-  border: 1px solid var(--border-color);
-  padding: 0.5rem;
+  padding: 1rem;
   background: var(--bg-primary);
+  border-top: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
 }
 
 .file-item {
   padding: 0.75rem 1rem;
   border: 2px solid transparent;
   border-radius: 10px;
-  border-bottom: 1px solid var(--border-light);
   cursor: pointer;
-  transition: all 0.3s ease;
   background: var(--bg-primary);
 }
 
@@ -263,15 +229,14 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
 
 .file-item.active {
   background: var(--accent-bg);
-  font-weight: bold;
   border-color: var(--accent-color);
   box-shadow: var(--shadow-accent);
 }
 
 .file-name {
-  font-size: 1rem;
-  margin-bottom: 0.2rem;
-  font-weight: 600;
+  margin-bottom: 0.3rem;
+  font-size: 1.2rem;
+  font-weight: bold;
   color: var(--text-primary);
   overflow: hidden;
 }
@@ -281,61 +246,9 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
   color: var(--text-secondary);
 }
 
-.preview-section {
-  width: 50%;
-  display: flex;
-  flex-direction: column;
-  background: var(--bg-primary);
-}
-
-.preview-header {
-  padding: 24px;
-  border-bottom: 2px solid var(--border-color);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--bg-secondary);
-}
-
-.preview-header h3 {
-  margin: 0;
-  color: var(--text-primary);
-  font-size: 20px;
-  font-weight: 600;
-}
-
-.selected-info {
-  background: var(--success-bg);
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 14px;
-  color: var(--success-text);
-  font-weight: 500;
-}
-
-.preview-content {
-  flex: 1;
-  padding: 24px;
-  overflow: auto;
-  display: flex;
-  color: var(--text-primary);
-  justify-content: start;
-  align-items: start;
-  background: var(--bg-primary);
-}
-
-.image-preview {
-  justify-content: center;
-  align-items: center;
-}
-
-.image-preview img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 8px;
-  box-shadow: var(--shadow-md);
-}
-
+/* 
+to remove
+*/
 .preview-body {
   padding: 24px;
   border-radius: 10px;
@@ -356,28 +269,30 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
   border: 1px solid var(--border-color);
 }
 
-.file-list::-webkit-scrollbar,
-.preview-body::-webkit-scrollbar {
-  width: 8px;
+.preview-content {
+  flex: 1;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  padding: 1rem;
+  overflow: auto;
+  border: 1px solid var(--border-color);
+  background: var(--bg-primary);
 }
 
-.file-list::-webkit-scrollbar-track,
-.preview-body::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
-  border-radius: 4px;
+.image-preview {
+  justify-content: center;
+  align-items: center;
 }
 
-.file-list::-webkit-scrollbar-thumb,
-.preview-body::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-thumb);
-  border-radius: 4px;
+.image-preview img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
 }
 
-.file-list::-webkit-scrollbar-thumb:hover,
-.preview-body::-webkit-scrollbar-thumb:hover {
-  background: var(--scrollbar-thumb-hover);
-}
-
+/*
 @media (max-width: 768px) {
   .manager {
     flex-direction: column;
@@ -393,4 +308,5 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
     border-bottom: 2px solid var(--border-color);
   }
 }
+*/
 </style>
