@@ -86,7 +86,7 @@ const selectFile = (selected: fileInfo) => {
 
   try {
     const data = aesCBCDecrypt(props.cc, selectedFileType.value, selected, pack.value);
-    const format = selectedFile.value.split(".").pop();
+    const format = selectedFile.value.split(".").pop()!;
 
     if (format === "png") {
       const blob = new Blob([data], { type: "image/png" });
@@ -103,7 +103,7 @@ const selectFile = (selected: fileInfo) => {
         };
       };
     } else {
-      previewContent.value = format === "json" ? JSON.stringify(JSON.parse(data as string), null, 2) : (data as string);
+      previewContent.value = ["json", "preset"].includes(format) ? JSON.stringify(JSON.parse(data as string), null, 2) : (data as string);
       previewImageUrl.value = null;
     }
   } catch (error) {
