@@ -98,26 +98,44 @@ const selectFile = (selected: fileInfo) => {
 };
 
 const copyToClipboard = async () => {
-  const file = selectedFile.value;
-  if (!file) {
-    return;
-  }
+  const file = selectedFile.value!;
+  const extension = file.split(".").pop();
 
-  const format = file.split(".").pop();
-  if (format === "png") {
-    if (!previewImageUrl.value) {
-      return;
-    }
+  if (extension === "png") {
+    if (!previewImageUrl.value) return;
+
     const response = await fetch(previewImageUrl.value);
     const blob = await response.blob();
     await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
   } else {
     await navigator.clipboard.writeText(`
-\`\`\`${format}
+\`\`\`${extension}
 ${previewContent.value}
 \`\`\`
       `);
   }
+};
+
+const downloadFile = async () => {
+  const file = selectedFile.value!;
+  const extension = file.split(".").pop();
+
+  const a = document.createElement("a");
+
+  if (extension === "png") {
+    if (!previewImageUrl.value) return;
+
+    const response = await fetch(previewImageUrl.value);
+    const blob = await response.blob();
+    a.href = URL.createObjectURL(blob);
+  } else {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([previewContent.value!], { type: `text/${extension}` }));
+  }
+
+  a.download = file;
+  a.click();
+  URL.revokeObjectURL(a.href);
 };
 
 watch([selectedFileType, () => props.cc, () => props.version], loadData, { immediate: true });
@@ -143,7 +161,7 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
       </div>
       <div class="file-list">
         <div v-for="file in filterListFiles" :key="file?.name" class="file-item" :class="{ active: selectedFile === file?.name }" @click="selectFile(file!)">
-          <div v-if="file == null" class="no-files">
+          <div v-if="file === null" class="no-files">
             <p>沒有可用的文件</p>
           </div>
           <div v-else>
@@ -158,6 +176,7 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
         <h3>文件預覽</h3>
         <div v-if="selectedFile" class="detail-info">
           <i class="bi bi-clipboard-fill copy-icon" @click="copyToClipboard">複製</i>
+          <i class="bi bi-download download-icon" @click="downloadFile">下載</i>
           <span>當前選擇: {{ selectedFile }}</span>
         </div>
       </div>

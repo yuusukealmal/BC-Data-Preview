@@ -143,12 +143,14 @@ select:hover {
   }
 }
 
-.copy-icon {
+.copy-icon,
+.download-icon {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.copy-icon:hover {
+.copy-icon:hover,
+.download-icon:hover {
   color: #3d8bffef;
 }
