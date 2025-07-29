@@ -11,3 +11,9 @@ export interface List {
 }
 
 export type fileType = "DataLocal" | "DownloadLocal" | "ImageDataLocal" | "ImageLocal" | "MapLocal" | "NumberLocal" | "resLocal" | "UnitLocal";
+
+export interface imageInfo {
+  width: number;
+  height: number;
+  size: number;
+}

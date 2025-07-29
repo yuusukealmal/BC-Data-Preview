@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, type PropType, watch, computed } from "vue";
 
-import type { countryCode, List, fileType, fileInfo } from "../types/index";
+import type { countryCode, List, fileType, fileInfo, imageInfo } from "../types/index";
 import { aesCBCDecrypt, aesECBDecrypt } from "../utils/crypto/decrypt";
 
 import Code from "./Code.vue";
@@ -25,6 +25,11 @@ const keyWordValue = ref<string>("");
 const selectedFile = ref<string | null>(null);
 const previewContent = ref<string | null>(null);
 const previewImageUrl = ref<string | null>(null);
+const imageInfo = ref<imageInfo>({
+  width: 0,
+  height: 0,
+  size: 0,
+});
 
 const filterListFiles = computed(() => {
   if (!keyWordValue.value) {
@@ -87,6 +92,16 @@ const selectFile = (selected: fileInfo) => {
       const blob = new Blob([data], { type: "image/png" });
       previewImageUrl.value = URL.createObjectURL(blob);
       previewContent.value = null;
+
+      const img = new Image();
+      img.src = URL.createObjectURL(blob);
+      img.onload = () => {
+        imageInfo.value = {
+          width: img.width,
+          height: img.height,
+          size: Math.round(((data as ArrayBuffer).byteLength / 1024) * 100) / 100,
+        };
+      };
     } else {
       previewContent.value = format === "json" ? JSON.stringify(JSON.parse(data as string), null, 2) : (data as string);
       previewImageUrl.value = null;
@@ -184,6 +199,9 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
         <div v-if="selectedFile" class="preview">
           <div v-if="previewImageUrl" class="image-preview">
             <img :src="previewImageUrl" :alt="selectedFile" />
+            <div class="image-info">
+              <span>W: {{ imageInfo.width }}px | H: {{ imageInfo.height }}px | Size: {{ imageInfo.size }} Kib</span>
+            </div>
           </div>
           <div v-else>
             <Code :code="previewContent!" :language="selectedFile.split('.').pop()" />
@@ -316,11 +334,18 @@ section {
 
 .image-preview {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 100%;
   height: 100%;
-  overflow: auto;
+}
+
+.image-info {
+  margin-top: 0.5em;
+  opacity: 0.3;
+  flex-direction: column;
+  justify-content: center;
 }
 
 /*
