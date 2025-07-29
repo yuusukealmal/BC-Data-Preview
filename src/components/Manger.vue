@@ -225,6 +225,7 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
 }
 
 .wrapper {
+  flex: 1;
   display: flex;
   border-radius: 12px;
   overflow: hidden;
@@ -233,8 +234,6 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
 }
 
 section {
-  width: 50%;
-  height: 100vh;
   display: flex;
   flex-direction: column;
   background: var(--bg-primary);
@@ -290,6 +289,7 @@ section {
   background: var(--bg-primary);
   border-top: 1px solid var(--border-color);
   border-right: 1px solid var(--border-color);
+  max-height: 100%;
 }
 
 .file-item {

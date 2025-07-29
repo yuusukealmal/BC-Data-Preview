@@ -41,39 +41,35 @@ const toggleTheme = () => {
 </script>
 
 <template>
-  <div>
-    <header class="header">
-      <div>
-        <div class="select-wrapper">
-          <label>選擇版本：</label>
-          <select v-model="selectedCC" @change="selectedVersion = null">
-            <option v-for="(label, code) in countryMap" :key="code" :value="code">
-              {{ label }}
-            </option>
-          </select>
-          <select v-if="selectedCC" v-model="selectedVersion">
-            <option v-for="version in countryVersions" :key="version || 'none'" :value="version">
-              {{ version !== null ? version : "無版本可以選擇" }}
-            </option>
-          </select>
-          <select v-else></select>
-        </div>
+  <header class="header">
+    <div>
+      <div class="select-wrapper">
+        <label>選擇版本：</label>
+        <select v-model="selectedCC" @change="selectedVersion = null">
+          <option v-for="(label, code) in countryMap" :key="code" :value="code">
+            {{ label }}
+          </option>
+        </select>
+        <select v-if="selectedCC" v-model="selectedVersion">
+          <option v-for="version in countryVersions" :key="version || 'none'" :value="version">
+            {{ version !== null ? version : "無版本可以選擇" }}
+          </option>
+        </select>
+        <select v-else></select>
       </div>
-      <div class="theme-toggle" @click="toggleTheme">
-        <i v-if="!isDark" class="bi bi-sun-fill" style="font-size: 24px"></i>
-        <i v-if="isDark" class="bi bi-moon-fill" style="font-size: 24px"></i>
-      </div>
-    </header>
+    </div>
+    <div class="theme-toggle" @click="toggleTheme">
+      <i v-if="!isDark" class="bi bi-sun-fill" style="font-size: 24px"></i>
+      <i v-if="isDark" class="bi bi-moon-fill" style="font-size: 24px"></i>
+    </div>
+  </header>
 
-    <main class="main-content">
-      <div v-if="selectedCC && selectedVersion">
-        <Manger :cc="selectedCC" :version="selectedVersion" />
-      </div>
-      <div v-else class="welcome">
-        <p>選擇檔案</p>
-      </div>
-    </main>
-  </div>
+  <main class="main-content">
+    <Manger v-if="selectedCC && selectedVersion" :cc="selectedCC" :version="selectedVersion" />
+    <div v-else class="welcome">
+      <p>選擇檔案</p>
+    </div>
+  </main>
 </template>
 
 <style scoped>
@@ -87,7 +83,9 @@ const toggleTheme = () => {
 }
 
 .main-content {
-  height: 100vh;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   padding: 8px 16px;
   overflow: hidden;
 }
