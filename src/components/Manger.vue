@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ref, type PropType, watch } from "vue";
-import type { countryCode, List, fileType } from "../types/index";
+import { ref, type PropType, watch, computed } from "vue";
+import type { countryCode, List, fileType, fileInfo } from "../types/index";
 import { aesCBCDecrypt, aesECBDecrypt } from "../utils/crypto/decrypt";
+
+import Code from "./Code.vue";
 
 const props = defineProps({
   cc: {
@@ -18,7 +20,14 @@ const fileTypesList: fileType[] = ["DataLocal", "DownloadLocal", "ImageDataLocal
 
 const selectedFileType = ref<fileType>(fileTypesList[0]);
 const list = ref<List | null>(null);
+const filterListFiles = computed(() => {
+  if (!keyWordValue.value) {
+    return list.value?.files || [null];
+  }
+  return list.value?.files?.filter((file) => file.name.includes(keyWordValue.value)) || [null];
+});
 const pack = ref<ArrayBuffer | null>(null);
+const keyWordValue = ref<string>("");
 const selectedFile = ref<string | null>(null);
 const previewContent = ref<string | null>(null);
 const previewImageUrl = ref<string | null>(null);
@@ -50,21 +59,18 @@ const loadData = async () => {
   pack.value = await packFile.arrayBuffer();
 };
 
-const selectFile = (idx: number) => {
+const selectFile = (selected: fileInfo) => {
   if (!list.value || !list.value.files || list.value.files.length === 0) {
     console.warn("No files available");
     return;
   }
 
-  const file = list.value.files[idx];
-  selectedFile.value = file.name;
+  selectedFile.value = selected.name;
 
   if (previewImageUrl.value) {
     URL.revokeObjectURL(previewImageUrl.value);
     previewImageUrl.value = null;
   }
-
-  console.log("Selected CC:", props.cc);
 
   if (!pack.value) {
     console.warn("Pack data not available");
@@ -73,19 +79,41 @@ const selectFile = (idx: number) => {
   }
 
   try {
-    const data = aesCBCDecrypt(props.cc, file, pack.value);
+    const data = aesCBCDecrypt(props.cc, selected, pack.value);
+    const format = selectedFile.value.split(".").pop();
 
-    if (file.name.endsWith(".png")) {
+    if (format === "png") {
       const blob = new Blob([data], { type: "image/png" });
       previewImageUrl.value = URL.createObjectURL(blob);
       previewContent.value = null;
     } else {
-      previewContent.value = data as string;
+      previewContent.value = format === "json" ? JSON.stringify(JSON.parse(data as string), null, 2) : (data as string);
       previewImageUrl.value = null;
     }
   } catch (error) {
     console.error("Error decrypting file:", error);
     previewContent.value = "解密文件時發生錯誤";
+  }
+};
+
+const copyToClipboard = async () => {
+  const file = selectedFile.value;
+  if (file) {
+    const format = file.split(".").pop();
+
+    if (format === "png") {
+      if (previewImageUrl.value) {
+        const response = await fetch(previewImageUrl.value);
+        const blob = await response.blob();
+        await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+      }
+    } else {
+      await navigator.clipboard.writeText(`
+\`\`\`${format}
+${previewContent.value}
+\`\`\`
+      `);
+    }
   }
 };
 
@@ -100,22 +128,24 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
         {{ fileType }}
       </option>
     </select>
+    <span>篩選: </span>
+    <input type="text" v-model="keyWordValue" />
   </div>
   <div class="wrapper">
     <section>
       <div class="header">
         <h3>文件列表</h3>
-        <span class="detail-info">{{ list?.files?.length || 0 }} 個文件</span>
+        <span class="detail-info">{{ filterListFiles.length }} 個文件</span>
       </div>
       <div class="file-list">
-        <div v-for="(file, idx) in list.files" v-if="list?.files?.length" :key="file.name" class="file-item" :class="{ active: selectedFile === file.name }" @click="selectFile(idx)">
-          <div>
+        <div v-for="file in filterListFiles" class="file-item" :class="{ active: selectedFile === file?.name }" @click="selectFile(file!)">
+          <div v-if="file == null" class="no-files">
+            <p>沒有可用的文件</p>
+          </div>
+          <div v-else>
             <div class="file-name">{{ file.name }}</div>
             <div class="file-info">起始位置: {{ file.start }} | 大小: {{ file.offset }}</div>
           </div>
-        </div>
-        <div v-else class="no-files">
-          <p>沒有可用的文件</p>
         </div>
       </div>
     </section>
@@ -123,17 +153,18 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
     <section>
       <div class="header">
         <h3>文件預覽</h3>
-        <span v-if="selectedFile" class="detail-info">當前選擇: {{ selectedFile }}</span>
+        <div v-if="selectedFile" class="detail-info">
+          <i class="bi bi-clipboard-fill copy-icon" @click="copyToClipboard">複製</i>
+          <span>當前選擇: {{ selectedFile }}</span>
+        </div>
       </div>
       <div class="preview-content">
         <div v-if="selectedFile" class="preview">
-          <div class="preview-body">
-            <div v-if="previewImageUrl" class="image-preview">
-              <img :src="previewImageUrl" :alt="selectedFile" />
-            </div>
-            <div v-else>
-              <pre>{{ previewContent }}</pre>
-            </div>
+          <div v-if="previewImageUrl" class="image-preview">
+            <img :src="previewImageUrl" :alt="selectedFile" />
+          </div>
+          <div v-else>
+            <Code :code="previewContent!" :language="selectedFile.split('.').pop()" />
           </div>
         </div>
         <div v-else class="no-files">
@@ -187,7 +218,7 @@ section {
 .detail-info {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 1rem;
   padding: 2px 12px;
   font-size: 16px;
   font-weight: 500;
@@ -246,50 +277,29 @@ section {
   color: var(--text-secondary);
 }
 
-/* 
-to remove
-*/
-.preview-body {
-  padding: 24px;
-  border-radius: 10px;
-  min-height: 300px;
-  font-size: 14px;
-  line-height: 1.6;
-  border: 2px solid var(--border-color);
-  background: var(--bg-primary);
-}
-
-.preview-body pre {
-  color: var(--text-primary);
-  background: var(--bg-code);
-  padding: 16px;
-  border-radius: 8px;
-  overflow-x: auto;
-  font-family: "Courier New", monospace;
-  border: 1px solid var(--border-color);
+.preview {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
 }
 
 .preview-content {
   flex: 1;
   display: flex;
-  justify-content: start;
-  align-items: center;
+  justify-content: flex-start;
+  align-items: flex-start;
   padding: 1rem;
   overflow: auto;
-  border: 1px solid var(--border-color);
-  background: var(--bg-primary);
+  max-height: calc(100vh - 120px);
 }
 
 .image-preview {
+  display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.image-preview img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 8px;
-  box-shadow: var(--shadow-md);
+  width: 100%;
+  height: 100%;
+  overflow: auto;
 }
 
 /*

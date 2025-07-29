@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "crypto-js": "^4.2.0",
-    "vue": "^3.5.17"
+    "prismjs": "^1.30.0",
+    "vue": "^3.5.17",
+    "vue-prism-component": "^2.0.0"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.2.2",
