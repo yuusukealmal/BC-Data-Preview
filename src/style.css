@@ -79,21 +79,21 @@ textarea:focus {
 }
 
 /* select wrapper */
-.select-wrapper span {
-  font-weight: 500;
-  color: var(--text-primary);
-  min-width: 90px;
-  font-size: 16px;
-}
-
 .select-wrapper {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
+.select-wrapper span {
+  font-weight: 500;
+  color: var(--text-primary);
+  min-width: 40px;
+  font-size: 16px;
+}
+
 .select-wrapper select {
-  padding: 8px 12px;
+  margin-right: 1rem;
   border: 1px solid var(--border-input);
   border-radius: 8px;
   background: var(--bg-primary);
@@ -104,6 +104,17 @@ textarea:focus {
 
 .dropdown-wrapper select:focus {
   outline: none;
+  border-color: var(--focus-color);
+  box-shadow: 0 0 0 3px var(--focus-shadow);
+}
+
+input,
+select {
+  padding: 8px 12px;
+}
+
+input:hover,
+select:hover {
   border-color: var(--focus-color);
   box-shadow: 0 0 0 3px var(--focus-shadow);
 }
@@ -120,7 +131,7 @@ textarea:focus {
 
 .theme-toggle:hover {
   animation: spin 1s linear infinite;
-  color: #28a745;
+  color: rgb(250, 250, 32);
   opacity: 0.8;
 }
 @keyframes spin {
@@ -130,4 +141,14 @@ textarea:focus {
   100% {
     transform: rotate(360deg);
   }
+}
+
+.copy-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.copy-icon:hover {
+  color: #3d8bffef;
 }
