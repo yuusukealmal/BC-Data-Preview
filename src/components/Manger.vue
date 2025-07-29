@@ -111,9 +111,12 @@ const copyToClipboard = async () => {
     const blob = await response.blob();
     await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
   } else {
-    await navigator.clipboard.writeText(`\`\`\`${format}${previewContent.value}\`\`\``);
+    await navigator.clipboard.writeText(`
+\`\`\`${format}
+${previewContent.value}
+\`\`\`
+      `);
   }
-
 };
 
 watch([selectedFileType, () => props.cc, () => props.version], loadData, { immediate: true });
