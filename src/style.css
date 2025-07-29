@@ -95,7 +95,6 @@ textarea:focus {
 .select-wrapper select {
   margin-right: 1rem;
   border: 1px solid var(--border-input);
-  border-radius: 8px;
   background: var(--bg-primary);
   font-size: 14px;
   color: var(--text-primary);
@@ -111,6 +110,7 @@ textarea:focus {
 input,
 select {
   padding: 8px 12px;
+  border-radius: 8px;
 }
 
 input:hover,
