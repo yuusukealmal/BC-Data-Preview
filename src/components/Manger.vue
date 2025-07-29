@@ -129,7 +129,7 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
       </option>
     </select>
     <span>篩選: </span>
-    <input type="text" v-model="keyWordValue" />
+    <input v-model="keyWordValue" type="text" />
   </div>
   <div class="wrapper">
     <section>
