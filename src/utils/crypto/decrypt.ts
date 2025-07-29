@@ -50,8 +50,16 @@ export const aesECBDecrypt = (buffer: ArrayBuffer) => {
   return dataArray;
 };
 
-export const aesCBCDecrypt = (cc: countryCode, info: fileInfo, buffer: ArrayBuffer) => {
+export const aesCBCDecrypt = (cc: countryCode, folder: string, info: fileInfo, buffer: ArrayBuffer) => {
+  const IGNORE_FORMATS = ["imgcut", "maanim", "mamodel"];
+  const format = info.name.split(".").pop()!;
+
   const cropBuffer = crop(buffer, info);
+  if (folder === "ImageDataLocal" && IGNORE_FORMATS.includes(format)) {
+    const dataArray = new TextDecoder("utf-8").decode(crop(buffer, info));
+
+    return dataArray;
+  }
 
   const key = CBCKey[cc].KEY;
   const iv = CBCKey[cc].IV;

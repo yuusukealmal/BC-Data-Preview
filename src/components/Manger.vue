@@ -85,7 +85,7 @@ const selectFile = (selected: fileInfo) => {
   }
 
   try {
-    const data = aesCBCDecrypt(props.cc, selected, pack.value);
+    const data = aesCBCDecrypt(props.cc, selectedFileType.value, selected, pack.value);
     const format = selectedFile.value.split(".").pop();
 
     if (format === "png") {
