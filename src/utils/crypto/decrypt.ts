@@ -46,7 +46,7 @@ export const aesECBDecrypt = (buffer: ArrayBuffer) => {
   });
 
   const dataArray = data.toString(CryptoJS.enc.Utf8);
-  console.log(dataArray);
+  // console.log(dataArray);
   return dataArray;
 };
 
@@ -67,16 +67,17 @@ export const aesCBCDecrypt = (cc: countryCode, info: fileInfo, buffer: ArrayBuff
     iv: iv,
   });
 
+  const array = new Uint8Array(data.sigBytes);
+  for (let i = 0; i < data.sigBytes; i++) {
+    array[i] = (data.words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
+  }
+  const dataArray = deletePadding(array);
+
   if (info.name.endsWith(".png")) {
-    const array = new Uint8Array(data.sigBytes);
-    for (let i = 0; i < data.sigBytes; i++) {
-      array[i] = (data.words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
-    }
-    const dataArray = deletePadding(array);
     return dataArray;
   } else {
-    const dataString = data.toString(CryptoJS.enc.Utf8);
-    console.log(dataString);
+    const dataString = new TextDecoder("utf-8").decode(dataArray);
+    // console.log(dataString);
     return dataString;
   }
 };
