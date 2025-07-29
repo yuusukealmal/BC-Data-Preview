@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, type PropType, watch, computed, onUnmounted } from "vue";
+import { ref, type PropType, watch, computed } from "vue";
 
 import type { countryCode, List, fileType, fileInfo } from "../types/index";
 import { aesCBCDecrypt, aesECBDecrypt } from "../utils/crypto/decrypt";
