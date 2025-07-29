@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, type PropType, watch, computed, onUnmounted } from "vue";
+
 import type { countryCode, List, fileType, fileInfo } from "../types/index";
 import { aesCBCDecrypt, aesECBDecrypt } from "../utils/crypto/decrypt";
 
@@ -24,13 +25,6 @@ const keyWordValue = ref<string>("");
 const selectedFile = ref<string | null>(null);
 const previewContent = ref<string | null>(null);
 const previewImageUrl = ref<string | null>(null);
-const container = ref<HTMLElement | null>(null);
-const leftPane = ref<HTMLElement | null>(null);
-const rightPane = ref<HTMLElement | null>(null);
-
-let isResizing: boolean = false;
-let startX = 0;
-let startLeftWidth = 0;
 
 const filterListFiles = computed(() => {
   if (!keyWordValue.value) {
@@ -126,35 +120,6 @@ ${previewContent.value}
   }
 };
 
-const startResize = (e: MouseEvent) => {
-  isResizing = true;
-  startX = e.clientX;
-  startLeftWidth = leftPane.value!.clientWidth;
-  window.addEventListener("mousemove", onMouseMove);
-  window.addEventListener("mouseup", stopResize);
-};
-
-const onMouseMove = (e: MouseEvent) => {
-  if (!isResizing || !container.value) return;
-  const delta = e.clientX - startX;
-  const newWidth = startLeftWidth + delta;
-
-  const min = 100;
-  const max = container.value!.clientWidth - 100;
-  leftPane.value!.style.width = `${Math.min(max, Math.max(min, newWidth))}px`;
-  rightPane.value!.style.width = `${container.value!.clientWidth - leftPane.value!.clientWidth}px`;
-};
-
-const stopResize = () => {
-  isResizing = false;
-  window.removeEventListener("mousemove", onMouseMove);
-  window.removeEventListener("mouseup", stopResize);
-};
-
-onUnmounted(() => {
-  stopResize();
-});
-
 watch([selectedFileType, () => props.cc, () => props.version], loadData, { immediate: true });
 </script>
 
@@ -170,8 +135,8 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
     <input v-model="keyWordValue" type="text" />
   </div>
 
-  <div ref="container" class="wrapper">
-    <section ref="leftPane">
+  <div class="wrapper">
+    <section class="list-view">
       <div class="header">
         <h3>文件列表</h3>
         <span class="detail-info">{{ filterListFiles.length }} 個文件</span>
@@ -188,8 +153,7 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
         </div>
       </div>
     </section>
-    <div class="resizer" @mousedown="startResize" />
-    <section ref="rightPane">
+    <section class="pack-view">
       <div class="header">
         <h3>文件預覽</h3>
         <div v-if="selectedFile" class="detail-info">
@@ -241,6 +205,14 @@ section {
   overflow: hidden;
 }
 
+.list-view {
+  flex: 1;
+}
+
+.pack-view {
+  flex: 2;
+}
+
 .header {
   display: flex;
   border: 2px solid var(--border-color);
@@ -273,7 +245,8 @@ section {
   color: var(--text-muted);
 }
 
-.file-list {
+.file-list,
+.preview-content {
   flex: 1;
   overflow-y: auto;
   padding: 1rem;
@@ -322,16 +295,6 @@ section {
   overflow: auto;
 }
 
-.preview-content {
-  flex: 1;
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  padding: 1rem;
-  overflow: auto;
-  max-height: calc(100vh - 120px);
-}
-
 .image-preview {
   display: flex;
   justify-content: center;
@@ -339,17 +302,6 @@ section {
   width: 100%;
   height: 100%;
   overflow: auto;
-}
-
-.resizer {
-  width: 6px;
-  cursor: ew-resize;
-  background-color: #ccc;
-  transition: background-color 0.2s;
-}
-
-.resizer:hover {
-  background-color: #999;
 }
 
 /*
