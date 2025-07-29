@@ -10,4 +10,12 @@ export interface List {
   files: fileInfo[];
 }
 
-export type fileType = "DataLocal" | "DownloadLocal" | "ImageDataLocal" | "ImageLocal" | "MapLocal" | "NumberLocal" | "resLocal" | "UnitLocal";
+export type fileType =
+  | "DataLocal"
+  | "DownloadLocal"
+  | "ImageDataLocal"
+  | "ImageLocal"
+  | "MapLocal"
+  | "NumberLocal"
+  | "resLocal"
+  | "UnitLocal"

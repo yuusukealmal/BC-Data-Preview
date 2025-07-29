@@ -16,21 +16,21 @@ const props = defineProps({
   },
 });
 
-const fileTypesList: fileType[] = ["DataLocal", "DownloadLocal", "ImageDataLocal", "ImageLocal", "MapLocal", "NumberLocal", "resLocal", "UnitLocal"] as const;
-
-const selectedFileType = ref<fileType>(fileTypesList[0]);
+const FILE_TYPE_LIST: fileType[] = ["DataLocal", "DownloadLocal", "ImageDataLocal", "ImageLocal", "MapLocal", "NumberLocal", "resLocal", "UnitLocal"] as const;
+const selectedFileType = ref<fileType>(FILE_TYPE_LIST[0]);
 const list = ref<List | null>(null);
+const pack = ref<ArrayBuffer | null>(null);
+const keyWordValue = ref<string>("");
+const selectedFile = ref<string | null>(null);
+const previewContent = ref<string | null>(null);
+const previewImageUrl = ref<string | null>(null);
+
 const filterListFiles = computed(() => {
   if (!keyWordValue.value) {
     return list.value?.files || [null];
   }
   return list.value?.files?.filter((file) => file.name.includes(keyWordValue.value)) || [null];
 });
-const pack = ref<ArrayBuffer | null>(null);
-const keyWordValue = ref<string>("");
-const selectedFile = ref<string | null>(null);
-const previewContent = ref<string | null>(null);
-const previewImageUrl = ref<string | null>(null);
 
 const loadData = async () => {
   if (!selectedFileType.value || !props.cc || !props.version) {
@@ -38,9 +38,11 @@ const loadData = async () => {
     return;
   }
 
-  const listFile = await fetch(`/${props.cc}/${props.version}/${selectedFileType.value}.list`);
-  const listResult = aesECBDecrypt(await listFile.arrayBuffer());
+  const fileBase = `/${props.cc}/${props.version}/${selectedFileType.value}`;
+  const listFile = await fetch(`${fileBase}.list`);
+  const packFile = await fetch(`${fileBase}.pack`);
 
+  const listResult = aesECBDecrypt(await listFile.arrayBuffer());
   list.value = {
     files: listResult
       .split("\n")
@@ -54,8 +56,6 @@ const loadData = async () => {
         };
       }),
   };
-
-  const packFile = await fetch(`/${props.cc}/${props.version}/${selectedFileType.value}.pack`);
   pack.value = await packFile.arrayBuffer();
 };
 
@@ -98,23 +98,22 @@ const selectFile = (selected: fileInfo) => {
 
 const copyToClipboard = async () => {
   const file = selectedFile.value;
-  if (file) {
-    const format = file.split(".").pop();
-
-    if (format === "png") {
-      if (previewImageUrl.value) {
-        const response = await fetch(previewImageUrl.value);
-        const blob = await response.blob();
-        await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
-      }
-    } else {
-      await navigator.clipboard.writeText(`
-\`\`\`${format}
-${previewContent.value}
-\`\`\`
-      `);
-    }
+  if (!file) {
+    return;
   }
+
+  const format = file.split(".").pop();
+  if (format === "png") {
+    if (!previewImageUrl.value) {
+      return;
+    }
+    const response = await fetch(previewImageUrl.value);
+    const blob = await response.blob();
+    await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+  } else {
+    await navigator.clipboard.writeText(`\`\`\`${format}${previewContent.value}\`\`\``);
+  }
+
 };
 
 watch([selectedFileType, () => props.cc, () => props.version], loadData, { immediate: true });
@@ -124,7 +123,7 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
   <div class="file-type-selector select-wrapper">
     <span>文件類型：</span>
     <select v-model="selectedFileType">
-      <option v-for="fileType in fileTypesList" :key="fileType" :value="fileType">
+      <option v-for="fileType in FILE_TYPE_LIST" :key="fileType" :value="fileType">
         {{ fileType }}
       </option>
     </select>
