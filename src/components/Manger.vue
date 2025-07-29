@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, type PropType, watch, computed } from "vue";
+import { ref, type PropType, watch, computed, onUnmounted } from "vue";
 import type { countryCode, List, fileType, fileInfo } from "../types/index";
 import { aesCBCDecrypt, aesECBDecrypt } from "../utils/crypto/decrypt";
 
@@ -24,6 +24,13 @@ const keyWordValue = ref<string>("");
 const selectedFile = ref<string | null>(null);
 const previewContent = ref<string | null>(null);
 const previewImageUrl = ref<string | null>(null);
+const container = ref<HTMLElement | null>(null);
+const leftPane = ref<HTMLElement | null>(null);
+const rightPane = ref<HTMLElement | null>(null);
+
+let isResizing: boolean = false;
+let startX = 0;
+let startLeftWidth = 0;
 
 const filterListFiles = computed(() => {
   if (!keyWordValue.value) {
@@ -113,8 +120,36 @@ const copyToClipboard = async () => {
   } else {
     await navigator.clipboard.writeText(`\`\`\`${format}${previewContent.value}\`\`\``);
   }
-
 };
+
+const startResize = (e: MouseEvent) => {
+  isResizing = true;
+  startX = e.clientX;
+  startLeftWidth = leftPane.value!.clientWidth;
+  window.addEventListener("mousemove", onMouseMove);
+  window.addEventListener("mouseup", stopResize);
+};
+
+const onMouseMove = (e: MouseEvent) => {
+  if (!isResizing || !container.value) return;
+  const delta = e.clientX - startX;
+  const newWidth = startLeftWidth + delta;
+
+  const min = 100;
+  const max = container.value!.clientWidth - 100;
+  leftPane.value!.style.width = `${Math.min(max, Math.max(min, newWidth))}px`;
+  rightPane.value!.style.width = `${container.value!.clientWidth - leftPane.value!.clientWidth}px`;
+};
+
+const stopResize = () => {
+  isResizing = false;
+  window.removeEventListener("mousemove", onMouseMove);
+  window.removeEventListener("mouseup", stopResize);
+};
+
+onUnmounted(() => {
+  stopResize();
+});
 
 watch([selectedFileType, () => props.cc, () => props.version], loadData, { immediate: true });
 </script>
@@ -130,14 +165,15 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
     <span>篩選: </span>
     <input v-model="keyWordValue" type="text" />
   </div>
-  <div class="wrapper">
-    <section>
+
+  <div ref="container" class="wrapper">
+    <section ref="leftPane">
       <div class="header">
         <h3>文件列表</h3>
         <span class="detail-info">{{ filterListFiles.length }} 個文件</span>
       </div>
       <div class="file-list">
-        <div v-for="file in filterListFiles" class="file-item" :class="{ active: selectedFile === file?.name }" @click="selectFile(file!)">
+        <div v-for="file in filterListFiles" :key="file?.name" class="file-item" :class="{ active: selectedFile === file?.name }" @click="selectFile(file!)">
           <div v-if="file == null" class="no-files">
             <p>沒有可用的文件</p>
           </div>
@@ -148,8 +184,8 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
         </div>
       </div>
     </section>
-
-    <section>
+    <div class="resizer" @mousedown="startResize" />
+    <section ref="rightPane">
       <div class="header">
         <h3>文件預覽</h3>
         <div v-if="selectedFile" class="detail-info">
@@ -299,6 +335,17 @@ section {
   width: 100%;
   height: 100%;
   overflow: auto;
+}
+
+.resizer {
+  width: 6px;
+  cursor: ew-resize;
+  background-color: #ccc;
+  transition: background-color 0.2s;
+}
+
+.resizer:hover {
+  background-color: #999;
 }
 
 /*
