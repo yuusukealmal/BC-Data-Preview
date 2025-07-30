@@ -73,15 +73,6 @@ const toggleTheme = () => {
 </template>
 
 <style scoped>
-.header {
-  padding: 15px 32px;
-  box-shadow: 0 2px 4px var(--border-color);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  min-height: 70px;
-}
-
 .main-content {
   flex: 1;
   display: flex;

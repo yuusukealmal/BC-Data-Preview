@@ -76,24 +76,26 @@ watch(() => props.listBuffer, decrypt, { immediate: true });
 
 <style scoped>
 .file-item {
-  padding: 0.75rem 1rem;
-  border: 2px solid transparent;
-  border-radius: 10px;
-  cursor: pointer;
-  background: var(--bg-primary);
-}
+  & {
+    padding: 0.75rem 1rem;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    background: var(--bg-primary);
+  }
 
-.file-item:hover {
-  background: var(--bg-hover);
-  border-color: var(--accent-color-light);
-  transform: translateX(6px);
-  box-shadow: var(--shadow-md);
-}
+  &:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent-color-light);
+    transform: translateX(6px);
+    box-shadow: var(--shadow-md);
+  }
 
-.file-item.active {
-  background: var(--accent-bg);
-  border-color: var(--accent-color);
-  box-shadow: var(--shadow-accent);
+  &.active {
+    background: var(--accent-bg);
+    border-color: var(--accent-color);
+    box-shadow: var(--shadow-accent);
+  }
 }
 
 .file-name {
