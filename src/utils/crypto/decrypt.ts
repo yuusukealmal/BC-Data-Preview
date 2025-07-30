@@ -1,9 +1,9 @@
 import * as CryptoJS from "crypto-js";
 
-import type { countryCode, fileInfo } from "../../types/index";
+import type { CountryCode, FileInfo } from "../../types/index";
 import { ECBKey, CBCKey } from "../../config/config";
 
-const crop = (buffer: ArrayBuffer, info: fileInfo) => {
+const crop = (buffer: ArrayBuffer, info: FileInfo) => {
   return buffer.slice(info.start, info.start + info.offset);
 };
 
@@ -50,7 +50,7 @@ export const aesECBDecrypt = (buffer: ArrayBuffer) => {
   return dataArray;
 };
 
-export const aesCBCDecrypt = (cc: countryCode, folder: string, info: fileInfo, buffer: ArrayBuffer) => {
+export const aesCBCDecrypt = (cc: CountryCode, folder: string, info: FileInfo, buffer: ArrayBuffer) => {
   const IGNORE_FORMATS = ["imgcut", "maanim", "mamodel"];
   const format = info.name.split(".").pop()!;
 

@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from "vue";
 
 import { versions } from "./config/versions";
-import type { countryCode } from "./types/index";
+import type { CountryCode } from "./types/index";
 
 import Manger from "./components/Manger.vue";
 import { applyTheme } from "./utils/theme";
@@ -19,7 +19,7 @@ onMounted(() => {
   applyTheme(true);
 });
 
-const selectedCC = ref<countryCode | null>(null);
+const selectedCC = ref<CountryCode | null>(null);
 const selectedVersion = ref<string | null>(null);
 const isDark = ref(false);
 

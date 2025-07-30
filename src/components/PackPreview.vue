@@ -1,0 +1,178 @@
+<script setup lang="ts">
+import { ref, watch, type PropType } from "vue";
+
+import type { CountryCode, FileInfo, ImageInfo } from "../types";
+import { aesCBCDecrypt } from "../utils/crypto/decrypt";
+import CodeBlock from "./CodeBlock.vue";
+
+const props = defineProps({
+  cc: {
+    type: String as PropType<CountryCode>,
+    required: true,
+  },
+  folder: {
+    type: String,
+    required: true,
+  },
+  packBuffer: {
+    type: ArrayBuffer,
+  },
+  fileInfo: {
+    type: Object as PropType<FileInfo>,
+  },
+});
+
+const previewContent = ref<string | null>(null);
+const previewImageUrl = ref<string | null>(null);
+const imageInfo = ref<ImageInfo>({
+  width: 0,
+  height: 0,
+  size: 0,
+});
+
+const decrypt = () => {
+  if (previewImageUrl.value) {
+    URL.revokeObjectURL(previewImageUrl.value);
+    previewImageUrl.value = null;
+  }
+
+  if (!props.packBuffer) {
+    console.warn("Pack data not available");
+    previewContent.value = "Pack 數據未載入";
+    return;
+  }
+
+  try {
+    const data = aesCBCDecrypt(props.cc, props.folder, props.fileInfo!, props.packBuffer);
+    const format = props.fileInfo!.name.split(".").pop()!;
+
+    if (format === "png") {
+      const blob = new Blob([data], { type: "image/png" });
+      previewImageUrl.value = URL.createObjectURL(blob);
+      previewContent.value = null;
+
+      const img = new Image();
+      img.src = URL.createObjectURL(blob);
+      img.onload = () => {
+        imageInfo.value = {
+          width: img.width,
+          height: img.height,
+          size: Math.round(((data as ArrayBuffer).byteLength / 1024) * 100) / 100,
+        };
+      };
+    } else {
+      previewContent.value = ["json", "preset"].includes(format) ? JSON.stringify(JSON.parse(data as string), null, 2) : (data as string);
+      previewImageUrl.value = null;
+    }
+  } catch (error) {
+    console.error("Error decrypting file:", error);
+    previewContent.value = "解密文件時發生錯誤";
+  }
+};
+
+const copyToClipboard = async () => {
+  const file = props.fileInfo;
+  const extension = file?.name.split(".").pop();
+
+  if (extension === "png") {
+    if (!previewImageUrl.value) return;
+
+    const response = await fetch(previewImageUrl.value);
+    const blob = await response.blob();
+    await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+  } else {
+    await navigator.clipboard.writeText(`
+\`\`\`${extension}
+${previewContent.value}
+\`\`\`
+      `);
+  }
+};
+
+const downloadFile = async () => {
+  const file = props.fileInfo;
+  const extension = file?.name.split(".").pop();
+
+  const a = document.createElement("a");
+
+  if (extension === "png") {
+    if (!previewImageUrl.value) return;
+
+    const response = await fetch(previewImageUrl.value);
+    const blob = await response.blob();
+    a.href = URL.createObjectURL(blob);
+  } else {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([previewContent.value!], { type: `text/${extension}` }));
+  }
+
+  a.download = file!.name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+};
+
+watch(() => props.fileInfo, decrypt);
+</script>
+
+<template>
+  <section class="pack-view">
+    <div class="header">
+      <h3>文件預覽</h3>
+      <div v-if="fileInfo" class="detail-info">
+        <i class="bi bi-clipboard-fill copy-icon" @click="copyToClipboard">複製</i>
+        <i class="bi bi-download download-icon" @click="downloadFile">下載</i>
+        <span>當前選擇: {{ fileInfo.name }}</span>
+      </div>
+    </div>
+    <div class="preview-content">
+      <div v-if="fileInfo" class="preview">
+        <div v-if="previewImageUrl" class="image-preview">
+          <img :src="previewImageUrl" :alt="fileInfo.name" />
+          <div class="image-info">
+            <span>W: {{ imageInfo.width }}px | H: {{ imageInfo.height }}px | Size: {{ imageInfo.size }} Kib</span>
+          </div>
+        </div>
+        <div v-else>
+          <CodeBlock :code="previewContent!" :language="fileInfo.name.split('.').pop()" />
+        </div>
+      </div>
+      <div v-else class="no-files">
+        <p>未選擇文件</p>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+.no-files {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  padding: 24px;
+  justify-content: center;
+  align-items: center;
+  color: var(--text-muted);
+}
+
+.preview {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
+.image-preview {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.image-info {
+  margin-top: 0.5em;
+  opacity: 0.3;
+  flex-direction: column;
+  justify-content: center;
+}
+</style>

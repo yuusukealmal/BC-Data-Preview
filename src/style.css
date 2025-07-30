@@ -29,6 +29,8 @@
 
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
@@ -41,8 +43,6 @@ body {
 #app {
   width: 100%;
   height: 100vh;
-  margin: 0;
-  padding: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -156,4 +156,45 @@ select:hover {
 .copy-icon:hover,
 .download-icon:hover {
   color: #3d8bffef;
+}
+
+/* view */
+section {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  border: 2px solid var(--border-color);
+  padding: 8px 18px;
+  justify-content: space-between;
+  background: var(--bg-secondary);
+}
+
+.header h3 {
+  color: var(--text-primary);
+  font-size: 20px;
+}
+
+.detail-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 2px 12px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.file-list,
+.preview-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border-top: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  max-height: 100%;
 }
