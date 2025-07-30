@@ -102,7 +102,6 @@ const downloadFile = async () => {
     const blob = await response.blob();
     a.href = URL.createObjectURL(blob);
   } else {
-    const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([previewContent.value!], { type: `text/${extension}` }));
   }
 

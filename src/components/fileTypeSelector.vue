@@ -4,7 +4,7 @@ import { FILE_TYPE_LIST, type FileType } from "../types";
 
 defineProps({
   selectedFileType: {
-    type: Object as PropType<FileType>,
+    type: String as PropType<FileType>,
     required: true,
   },
   keyWord: {
