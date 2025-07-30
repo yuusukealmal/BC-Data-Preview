@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch, type PropType } from "vue";
-import type { FileInfo, FileType, List } from "../types";
+import type { FileInfo, List } from "../types";
 import { aesECBDecrypt } from "../utils/crypto/decrypt";
 
 const props = defineProps({

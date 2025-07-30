@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { ref, type PropType, watch, computed } from "vue";
+import { ref, type PropType, watch } from "vue";
 
-import { type CountryCode, type List, type FileType, type FileInfo, type ImageInfo, FILE_TYPE_LIST } from "../types/index";
-import { aesCBCDecrypt, aesECBDecrypt } from "../utils/crypto/decrypt";
+import { type CountryCode, type FileType, type FileInfo, FILE_TYPE_LIST } from "../types/index";
 
 import fileTypeSelector from "./fileTypeSelector.vue";
 import FileList from "./FileList.vue";
@@ -43,7 +42,7 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
   <fileTypeSelector v-model:selectedFileType="selectedFileType" v-model:keyWord="keyWordValue" />
 
   <div class="wrapper">
-    <FileList :list-buffer="listBuffer" :key-word="keyWordValue" v-model:selectedFileInfo="selectedFile" class="list-view" />
+    <FileList v-model:selectedFileInfo="selectedFile" :list-buffer="listBuffer" :key-word="keyWordValue" class="list-view" />
     <PackPreview class="pack-view" :packBuffer="packBuffer" :file-info="selectedFile" :cc="cc" :folder="selectedFileType" />
   </div>
 </template>
