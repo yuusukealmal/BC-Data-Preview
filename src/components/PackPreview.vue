@@ -127,17 +127,11 @@ watch(() => props.fileInfo, decrypt);
       <div v-if="fileInfo" class="preview">
         <div v-if="previewImageUrl" class="image-preview">
           <img :src="previewImageUrl" :alt="fileInfo.name" />
-          <div class="image-info">
-            <span>W: {{ imageInfo.width }}px | H: {{ imageInfo.height }}px | Size: {{ imageInfo.size }} Kib</span>
-          </div>
+          <span class="image-info">W: {{ imageInfo.width }}px | H: {{ imageInfo.height }}px | Size: {{ imageInfo.size }} Kib</span>
         </div>
-        <div v-else>
-          <CodeBlock :code="previewContent!" :language="fileInfo.name.split('.').pop()" />
-        </div>
+        <CodeBlock v-else :code="previewContent!" :language="fileInfo.name.split('.').pop()" />
       </div>
-      <div v-else class="no-files">
-        <p>未選擇文件</p>
-      </div>
+      <p v-else class="no-files">未選擇文件</p>
     </div>
   </section>
 </template>

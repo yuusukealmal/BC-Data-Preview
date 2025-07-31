@@ -41,9 +41,9 @@ const decrypt = async () => {
 };
 const filterListFiles = computed(() => {
   if (!props.keyWord) {
-    return list.value?.files || [null];
+    return list.value?.files || [];
   }
-  return list.value?.files?.filter((file) => file.name.includes(props.keyWord)) || [null];
+  return list.value?.files?.filter((file) => file.name.includes(props.keyWord)) || [];
 });
 
 const onFileSelect = (file: FileInfo) => {
@@ -61,15 +61,13 @@ watch(() => props.listBuffer, decrypt, { immediate: true });
       <span class="detail-info">{{ filterListFiles.length }} 個文件</span>
     </div>
     <div class="file-list">
-      <div v-for="file in filterListFiles" :key="file?.name" class="file-item" :class="{ active: selectedFile === file?.name }" @click="onFileSelect(file!)">
-        <div v-if="file === null" class="no-files">
-          <p>沒有可用的文件</p>
-        </div>
-        <div v-else>
+      <template v-if="filterListFiles.length !== 0">
+        <div v-for="file in filterListFiles" :key="file.name" class="file-item" :class="{ active: selectedFile === file.name }" @click="onFileSelect(file)">
           <div class="file-name">{{ file.name }}</div>
           <div class="file-info">起始位置: {{ file.start }} | 大小: {{ file.offset }}</div>
         </div>
-      </div>
+      </template>
+      <p v-else class="no-files">沒有可用的文件</p>
     </div>
   </section>
 </template>

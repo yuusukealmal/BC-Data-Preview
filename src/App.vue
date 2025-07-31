@@ -66,9 +66,7 @@ const toggleTheme = () => {
 
   <main class="main-content">
     <Manger v-if="selectedCC && selectedVersion" :cc="selectedCC" :version="selectedVersion" />
-    <div v-else class="welcome">
-      <p>選擇檔案</p>
-    </div>
+    <p v-else class="welcome">選擇檔案</p>
   </main>
 </template>
 
