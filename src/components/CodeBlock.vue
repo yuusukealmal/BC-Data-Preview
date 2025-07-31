@@ -17,10 +17,6 @@ const props = defineProps({
   console.log('Hello World!');
 }`,
   },
-  language: {
-    type: String,
-    default: "ts",
-  },
 });
 
 const codeBlock = ref<HTMLElement | null>(null);
@@ -38,9 +34,7 @@ watch(() => props.code, highLight);
 </script>
 
 <template>
-  <pre class="line-numbers" :class="`language-${language}`">
-    <code ref="codeBlock">{{codes}}</code>
-  </pre>
+  <pre class="language-ts line-numbers"><code ref="codeBlock">{{codes}}</code></pre>
 </template>
 
 <style scoped>

@@ -129,7 +129,7 @@ watch(() => props.fileInfo, decrypt);
           <img :src="previewImageUrl" :alt="fileInfo.name" />
           <span class="image-info">W: {{ imageInfo.width }}px | H: {{ imageInfo.height }}px | Size: {{ imageInfo.size }} Kib</span>
         </div>
-        <CodeBlock v-else :code="previewContent!" :language="fileInfo.name.split('.').pop()" />
+        <CodeBlock v-else :code="previewContent!" />
       </div>
       <p v-else class="no-files">未選擇文件</p>
     </div>
