@@ -168,4 +168,17 @@ watch(() => props.fileInfo, decrypt);
   flex-direction: column;
   justify-content: center;
 }
+
+.copy-icon,
+.download-icon {
+  & {
+    font-style: normal;
+  }
+
+  &:hover {
+    cursor: pointer;
+    font-style: normal;
+    text-decoration: underline;
+  }
+}
 </style>
