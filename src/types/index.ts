@@ -18,3 +18,8 @@ export interface ImageInfo {
   height: number;
   size: number;
 }
+
+export type LabeledFile = {
+  info: FileInfo;
+  label: "normal" | "delete" | "add" | "modify";
+};

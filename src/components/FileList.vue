@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch, type PropType } from "vue";
-import type { FileInfo, List } from "../types";
+import type { FileInfo, LabeledFile, List } from "../types";
 import { aesECBDecrypt } from "../utils/crypto/decrypt";
-import * as CryptoJS from "crypto-js";
 
 const props = defineProps({
   listBuffer: {
@@ -21,11 +20,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["update:selectedFileInfo"]);
-
-type LabeledFile = {
-  info: FileInfo;
-  label: "normal" | "delete" | "add" | "modify";
-};
 
 const list = ref<List | null>(null);
 const comparedList = ref<List | null>(null);
@@ -83,27 +77,27 @@ const onFileSelect = (file: FileInfo) => {
 };
 
 const mergeList = async () => {
-  const aMap = new Map<string, FileInfo>();
-  const bMap = new Map<string, FileInfo>();
+  const listFiles = list.value?.files || [];
+  const comparedFiles = comparedList.value?.files || [];
 
-  for (const item of list.value?.files || []) aMap.set(item.name, item);
-  for (const item of comparedList.value?.files || []) bMap.set(item.name, item);
-
-  const allHashes = new Set([...aMap.keys(), ...bMap.keys()]);
-
-  mergedList.value = [];
-  for (const hash of allHashes) {
-    const aItem = aMap.get(hash);
-    const bItem = bMap.get(hash);
-
-    if (aItem && bItem) {
-      mergedList.value.push({ info: aItem, label: "normal" });
-    } else if (aItem) {
-      mergedList.value.push({ info: aItem, label: "delete" });
-    } else if (bItem) {
-      mergedList.value.push({ info: bItem, label: "add" });
-    }
+  if (!comparedList.value) {
+    mergedList.value = listFiles.map((file) => ({ info: file, label: "normal" }));
+    return;
   }
+
+  if (!list.value) {
+    mergedList.value = comparedFiles.map((file) => ({ info: file, label: "normal" }));
+    return;
+  }
+
+  const aMap = new Map(listFiles.map((item) => [item.name, item]));
+  const bMap = new Map(comparedFiles.map((item) => [item.name, item]));
+
+  mergedList.value = [...new Set([...aMap.keys(), ...bMap.keys()])].map((name) => {
+    const [aItem, bItem] = [aMap.get(name), bMap.get(name)];
+    const label = aItem && bItem ? "normal" : aItem ? "delete" : "add";
+    return { info: (aItem || bItem)!, label };
+  });
 };
 
 watch(() => props.listBuffer, decryptList, { immediate: true });

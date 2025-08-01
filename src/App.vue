@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 import { versions } from "./config/versions";
 import type { CountryCode } from "./types/index";
@@ -39,16 +39,6 @@ const toggleTheme = () => {
   isDark.value = !isDark.value;
   // applyTheme(isDark.value);
 };
-
-watch(
-  selectedVersion,
-  () => {
-    if (!selectedComparedVersion.value) {
-      selectedComparedVersion.value = selectedVersion.value;
-    }
-  },
-  { immediate: true },
-);
 </script>
 
 <template>

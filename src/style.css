@@ -144,6 +144,7 @@ textarea {
 .copy-icon,
 .download-icon {
   & {
+    font-style: normal;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -151,6 +152,9 @@ textarea {
 
   &:hover {
     color: #3d8bffef;
+    cursor: pointer;
+    font-style: normal;
+    text-decoration: underline;
   }
 }
 

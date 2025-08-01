@@ -18,7 +18,6 @@ const props = defineProps({
   },
   comparedVersion: {
     type: String,
-    required: true,
   },
 });
 
@@ -46,7 +45,7 @@ const loadData = async () => {
   comparedPackBuffer.value = await comparedPackFile.arrayBuffer();
 };
 
-watch([selectedFileType, () => props.cc, () => props.version], loadData, { immediate: true });
+watch([selectedFileType, () => props.cc, () => props.version, () => props.comparedVersion], loadData, { immediate: true });
 </script>
 
 <template>
