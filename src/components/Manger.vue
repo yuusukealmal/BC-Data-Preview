@@ -16,6 +16,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  comparedVersion: {
+    type: String,
+    required: true,
+  },
 });
 
 const selectedFileType = ref<FileType>(FILE_TYPE_LIST[0]);

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 
 import { versions } from "./config/versions";
 import type { CountryCode } from "./types/index";
@@ -21,6 +21,7 @@ onMounted(() => {
 
 const selectedCC = ref<CountryCode | null>(null);
 const selectedVersion = ref<string | null>(null);
+const selectedComparedVersion = ref<string | null>(null);
 const isDark = ref(false);
 
 const countryMap = {
@@ -38,6 +39,16 @@ const toggleTheme = () => {
   isDark.value = !isDark.value;
   // applyTheme(isDark.value);
 };
+
+watch(
+  selectedVersion,
+  () => {
+    if (!selectedComparedVersion.value) {
+      selectedComparedVersion.value = selectedVersion.value;
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
@@ -56,6 +67,12 @@ const toggleTheme = () => {
           </option>
         </select>
         <select v-else></select>
+        <select v-if="selectedCC" v-model="selectedComparedVersion">
+          <option v-for="version in countryVersions" :key="version || 'none'" :value="version">
+            {{ version !== null ? version : "無版本可以選擇" }}
+          </option>
+        </select>
+        <select v-else></select>
       </div>
     </div>
     <div class="theme-toggle" @click="toggleTheme">
@@ -65,7 +82,7 @@ const toggleTheme = () => {
   </header>
 
   <main class="main-content">
-    <Manger v-if="selectedCC && selectedVersion" :cc="selectedCC" :version="selectedVersion" />
+    <Manger v-if="selectedCC && selectedVersion" :cc="selectedCC" :version="selectedVersion" :comparedVersion="selectedComparedVersion!" />
     <p v-else class="welcome">選擇檔案</p>
   </main>
 </template>
