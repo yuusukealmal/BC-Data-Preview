@@ -27,9 +27,14 @@ const mergedList = ref<LabeledFile[]>([]);
 const selectedFileName = ref<string | null>(null);
 
 const decryptList = async () => {
-  if (!props.listBuffer) return;
+  if (!props.listBuffer) {
+    list.value = null;
+  }
+  if (!props.comparedListBuffer) {
+    comparedList.value = null;
+  }
 
-  const listResult = aesECBDecrypt(props.listBuffer);
+  const listResult = props.listBuffer ? aesECBDecrypt(props.listBuffer) : "";
   list.value = {
     files: listResult
       .split("\n")
@@ -43,14 +48,10 @@ const decryptList = async () => {
         };
       }),
   };
-};
 
-const decryptComparedList = async () => {
-  if (!props.comparedListBuffer) return;
-
-  const listResult = aesECBDecrypt(props.comparedListBuffer);
+  const comparedListResult = props.comparedListBuffer ? aesECBDecrypt(props.comparedListBuffer) : "";
   comparedList.value = {
-    files: listResult
+    files: comparedListResult
       .split("\n")
       .slice(1, -1)
       .map((item) => {
@@ -80,12 +81,12 @@ const mergeList = async () => {
   const listFiles = list.value?.files || [];
   const comparedFiles = comparedList.value?.files || [];
 
-  if (!comparedList.value) {
+  if (comparedFiles.length === 0) {
     mergedList.value = listFiles.map((file) => ({ info: file, label: "normal" }));
     return;
   }
 
-  if (!list.value) {
+  if (listFiles.length === 0) {
     mergedList.value = comparedFiles.map((file) => ({ info: file, label: "normal" }));
     return;
   }
@@ -100,8 +101,7 @@ const mergeList = async () => {
   });
 };
 
-watch(() => props.listBuffer, decryptList, { immediate: true });
-watch(() => props.comparedListBuffer, decryptComparedList, { immediate: true });
+watch([() => props.listBuffer, () => props.comparedListBuffer], decryptList, { immediate: true });
 watch([list, comparedList], mergeList, { immediate: true });
 </script>
 
