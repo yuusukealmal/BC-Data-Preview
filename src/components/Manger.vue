@@ -52,7 +52,6 @@ const loadComparedData = async () => {
 
 watch([selectedFileType, () => props.cc, () => props.version], loadData, { immediate: true });
 watch([selectedFileType, () => props.cc, () => props.comparedVersion], loadComparedData, { immediate: true });
-watch([selectedFileType, () => props.cc, () => props.version, () => props.comparedVersion], loadData, { immediate: true });
 </script>
 
 <template>
