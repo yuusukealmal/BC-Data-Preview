@@ -28,15 +28,22 @@ const selectedFile = ref<FileInfo>();
 
 const listBuffer = ref<ArrayBuffer>();
 const packBuffer = ref<ArrayBuffer>();
+const comparedListBuffer = ref<ArrayBuffer>();
+const comparedPackBuffer = ref<ArrayBuffer>();
 
 const loadData = async () => {
   const fileBase = `/${props.cc}/${props.version}/${selectedFileType.value}`;
+  const comparedFileBase = `/${props.cc}/${props.comparedVersion}/${selectedFileType.value}`;
 
   const listFile = await fetch(`${fileBase}.list`);
   const packFile = await fetch(`${fileBase}.pack`);
+  const comparedListFile = await fetch(`${comparedFileBase}.list`);
+  const comparedPackFile = await fetch(`${comparedFileBase}.pack`);
 
   listBuffer.value = await listFile.arrayBuffer();
   packBuffer.value = await packFile.arrayBuffer();
+  comparedListBuffer.value = await comparedListFile.arrayBuffer();
+  comparedPackBuffer.value = await comparedPackFile.arrayBuffer();
 };
 
 watch([selectedFileType, () => props.cc, () => props.version], loadData, { immediate: true });
@@ -46,7 +53,7 @@ watch([selectedFileType, () => props.cc, () => props.version], loadData, { immed
   <fileTypeSelector v-model:selectedFileType="selectedFileType" v-model:keyWord="keyWordValue" />
 
   <div class="wrapper">
-    <FileList v-model:selectedFileInfo="selectedFile" :list-buffer="listBuffer" :key-word="keyWordValue" class="list-view" />
+    <FileList v-model:selectedFileInfo="selectedFile" :list-buffer="listBuffer" :comparedListBuffer="comparedListBuffer" :key-word="keyWordValue" class="list-view" />
     <PackPreview class="pack-view" :packBuffer="packBuffer" :file-info="selectedFile" :cc="cc" :folder="selectedFileType" />
   </div>
 </template>
