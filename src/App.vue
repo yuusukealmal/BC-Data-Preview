@@ -56,7 +56,7 @@ watch(
     <div>
       <div class="select-wrapper">
         <label>選擇版本：</label>
-        <select v-model="selectedCC" @change="selectedVersion = null">
+        <select v-model="selectedCC" @change="selectedVersion = selectedComparedVersion = null">
           <option v-for="(label, code) in countryMap" :key="code" :value="code">
             {{ label }}
           </option>
