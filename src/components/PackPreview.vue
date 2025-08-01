@@ -171,13 +171,14 @@ watch(() => props.fileInfo, decrypt);
 
 .copy-icon,
 .download-icon {
-  font-style: normal;
-}
+  & {
+    font-style: normal;
+  }
 
-.copy-icon:hover,
-.download-icon:hover {
-  cursor: pointer;
-  font-style: normal;
-  text-decoration: underline;
+  &:hover {
+    cursor: pointer;
+    font-style: normal;
+    text-decoration: underline;
+  }
 }
 </style>
