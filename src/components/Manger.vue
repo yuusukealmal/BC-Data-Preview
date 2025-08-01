@@ -33,20 +33,26 @@ const comparedPackBuffer = ref<ArrayBuffer>();
 
 const loadData = async () => {
   const fileBase = `/${props.cc}/${props.version}/${selectedFileType.value}`;
-  const comparedFileBase = `/${props.cc}/${props.comparedVersion}/${selectedFileType.value}`;
 
   const listFile = await fetch(`${fileBase}.list`);
   const packFile = await fetch(`${fileBase}.pack`);
-  const comparedListFile = await fetch(`${comparedFileBase}.list`);
-  const comparedPackFile = await fetch(`${comparedFileBase}.pack`);
 
   listBuffer.value = await listFile.arrayBuffer();
   packBuffer.value = await packFile.arrayBuffer();
+};
+
+const loadComparedData = async () => {
+  const comparedFileBase = `/${props.cc}/${props.comparedVersion}/${selectedFileType.value}`;
+
+  const comparedListFile = await fetch(`${comparedFileBase}.list`);
+  const comparedPackFile = await fetch(`${comparedFileBase}.pack`);
+
   comparedListBuffer.value = await comparedListFile.arrayBuffer();
   comparedPackBuffer.value = await comparedPackFile.arrayBuffer();
 };
 
 watch([selectedFileType, () => props.cc, () => props.version], loadData, { immediate: true });
+watch([selectedFileType, () => props.cc, () => props.comparedVersion], loadComparedData, { immediate: true });
 </script>
 
 <template>
