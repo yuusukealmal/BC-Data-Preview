@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, type PropType } from "vue";
+import { onUnmounted, ref, watch, type PropType } from "vue";
 
 import type { CountryCode, FileInfo, ImageInfo } from "../types";
 import { aesCBCDecrypt } from "../utils/crypto/decrypt";
@@ -20,6 +20,12 @@ const props = defineProps({
   fileInfo: {
     type: Object as PropType<FileInfo>,
   },
+});
+
+onUnmounted(() => {
+  if (previewImageUrl.value) {
+    URL.revokeObjectURL(previewImageUrl.value);
+  }
 });
 
 const previewContent = ref<string | null>(null);
