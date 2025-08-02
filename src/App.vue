@@ -8,15 +8,15 @@ import { applyTheme } from "./utils/theme";
 import { useFileStore } from "./sotre/fileStore";
 
 onMounted(() => {
-  // const isDarked = localStorage.getItem("isDark");
-  // if (isDarked) {
-  //   const theme = JSON.parse(isDarked);
-  //   isDark.value = JSON.parse(theme);
+  const isDarked = localStorage.getItem("isDark");
+  if (isDarked) {
+    const theme = JSON.parse(isDarked);
+    isDark.value = JSON.parse(theme);
 
-  //   applyTheme(theme);
-  //   return;
-  // }
-  applyTheme(true);
+    applyTheme(theme);
+    return;
+  }
+  applyTheme(false);
 });
 
 const isDark = ref(false);
@@ -38,7 +38,7 @@ const countryVersions = computed(() => {
 
 const toggleTheme = () => {
   isDark.value = !isDark.value;
-  // applyTheme(isDark.value);
+  applyTheme(isDark.value);
 };
 </script>
 
