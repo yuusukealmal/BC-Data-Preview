@@ -1,4 +1,4 @@
-import { ref, computed, watch, type Ref } from "vue";
+import { ref, computed, watch } from "vue";
 import { defineStore } from "pinia";
 
 import { type CountryCode, type FileType, type FileInfo, type List, type LabeledFile, type FileStatus, FILE_TYPE_LIST } from "../types";
@@ -124,12 +124,12 @@ export const useFileStore = defineStore("useFileStore", () => {
       let comparedHash = comparedFileHashCache.get(fileName);
 
       if (!currentHash && packBuffer.value) {
-        currentHash = await getFileHash(packBuffer.value, currentFile);
+        currentHash = getFileHash(packBuffer.value, currentFile);
         fileHashCache.set(fileName, currentHash);
       }
 
       if (!comparedHash && comparedPackBuffer.value) {
-        comparedHash = await getFileHash(comparedPackBuffer.value, comparedFile);
+        comparedHash = getFileHash(comparedPackBuffer.value, comparedFile);
         comparedFileHashCache.set(fileName, comparedHash);
       }
 
