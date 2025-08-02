@@ -24,7 +24,6 @@ const fileStore = useFileStore();
 const fileInfo = computed(() => fileStore.selectedFile);
 
 const decrypt = () => {
-  console.log("OMG");
   if (previewImageUrl.value) {
     URL.revokeObjectURL(previewImageUrl.value);
     previewImageUrl.value = null;

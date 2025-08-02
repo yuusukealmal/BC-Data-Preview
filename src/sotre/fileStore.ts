@@ -1,4 +1,4 @@
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, type Ref } from "vue";
 import { defineStore } from "pinia";
 
 import { type CountryCode, type FileType, type FileInfo, type List, type LabeledFile, type FileStatus, FILE_TYPE_LIST } from "../types";
@@ -30,7 +30,7 @@ export const useFileStore = defineStore("useFileStore", () => {
   const visibleItems = ref<LabeledFile[]>([]);
   const currentPage = ref(0);
   const isLoading = ref(false);
-  const itemsPerPage = 50;
+  const PAGE_SIZE = 50;
 
   // md5 hash
   const fileHashCache = new Map<string, string>();
@@ -51,29 +51,30 @@ export const useFileStore = defineStore("useFileStore", () => {
     return filtered;
   });
 
-  const loadData = async () => {
+  const loadFileData = async (version: string) => {
+    const fileBase = `/${selectedCC.value}/${version}/${selectedFileType.value}`;
+
     try {
-      const fileBase = `/${selectedCC.value}/${selectedVersion.value}/${selectedFileType.value}`;
+      const [listResponse, packResponse] = await Promise.all([fetch(`${fileBase}.list`), fetch(`${fileBase}.pack`)]);
 
-      const listFile = await fetch(`${fileBase}.list`);
-      const packFile = await fetch(`${fileBase}.pack`);
-
-      const listContentType = listFile.headers.get("content-type");
-      const packContentType = packFile.headers.get("content-type");
+      const listContentType = listResponse.headers.get("content-type");
+      const packContentType = packResponse.headers.get("content-type");
 
       if (listContentType?.includes("text/html") || packContentType?.includes("text/html")) {
         throw new Error("Files not found");
       }
-
-      listBuffer.value = await listFile.arrayBuffer();
-      packBuffer.value = await packFile.arrayBuffer();
-
-      decryptList();
+      return { list: await listResponse.arrayBuffer(), pack: await packResponse.arrayBuffer() };
     } catch (error) {
-      listBuffer.value = undefined;
-      packBuffer.value = undefined;
-      console.error("Failed to Load File:", error);
+      return { list: undefined, pack: undefined };
     }
+  };
+
+  const loadData = async () => {
+    if (!selectedVersion.value) return;
+    const result = await loadFileData(selectedVersion.value);
+    listBuffer.value = result.list;
+    packBuffer.value = result.pack;
+    decryptList();
   };
 
   const loadComparedData = async () => {
@@ -82,63 +83,35 @@ export const useFileStore = defineStore("useFileStore", () => {
       comparedPackBuffer.value = undefined;
       return;
     }
+    const result = await loadFileData(selectedComparedVersion.value);
+    comparedListBuffer.value = result.list;
+    comparedPackBuffer.value = result.pack;
+    decryptComparedList();
+  };
 
-    try {
-      const comparedFileBase = `/${selectedCC.value}/${selectedComparedVersion.value}/${selectedFileType.value}`;
-
-      const comparedListFile = await fetch(`${comparedFileBase}.list`);
-      const comparedPackFile = await fetch(`${comparedFileBase}.pack`);
-
-      const comparedListContentType = comparedListFile.headers.get("content-type");
-      const comparedPackContentType = comparedPackFile.headers.get("content-type");
-
-      if (comparedListContentType?.includes("text/html") || comparedPackContentType?.includes("text/html")) {
-        throw new Error("Files not found");
-      }
-
-      comparedListBuffer.value = await comparedListFile.arrayBuffer();
-      comparedPackBuffer.value = await comparedPackFile.arrayBuffer();
-
-      decryptComparedList();
-    } catch (error) {
-      comparedListBuffer.value = undefined;
-      comparedPackBuffer.value = undefined;
-      console.error("Failed to Load File:", error);
-    }
+  const decryptFileList = (buffer: ArrayBuffer | undefined): List => {
+    const rawData = buffer ? aesECBDecrypt(buffer) : "";
+    return {
+      files: rawData
+        .split("\n")
+        .slice(1, -1)
+        .map((item) => {
+          const [name, start, offset] = item.split(",");
+          return {
+            name,
+            start: Number(start),
+            offset: Number(offset),
+          };
+        }),
+    };
   };
 
   const decryptList = () => {
-    const rawData = listBuffer.value ? aesECBDecrypt(listBuffer.value) : "";
-    list.value = {
-      files: rawData
-        .split("\n")
-        .slice(1, -1)
-        .map((item) => {
-          const [name, start, offset] = item.split(",");
-          return {
-            name,
-            start: Number(start),
-            offset: Number(offset),
-          };
-        }),
-    };
+    list.value = decryptFileList(listBuffer.value);
   };
 
   const decryptComparedList = () => {
-    const rawData = comparedListBuffer.value ? aesECBDecrypt(comparedListBuffer.value) : "";
-    comparedList.value = {
-      files: rawData
-        .split("\n")
-        .slice(1, -1)
-        .map((item) => {
-          const [name, start, offset] = item.split(",");
-          return {
-            name,
-            start: Number(start),
-            offset: Number(offset),
-          };
-        }),
-    };
+    comparedList.value = decryptFileList(comparedListBuffer.value);
   };
 
   const calcFileStatus = async (fileName: string, currentFile?: FileInfo, comparedFile?: FileInfo): Promise<FileStatus> => {
@@ -224,8 +197,8 @@ export const useFileStore = defineStore("useFileStore", () => {
     if (isLoading.value) return;
 
     isLoading.value = true;
-    const startIndex = currentPage.value * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
+    const startIndex = currentPage.value * PAGE_SIZE;
+    const endIndex = startIndex + PAGE_SIZE;
     const newItems = filterListFiles.value.slice(startIndex, endIndex);
 
     if (newItems.length > 0) {
@@ -240,12 +213,6 @@ export const useFileStore = defineStore("useFileStore", () => {
     selectedFile.value = file;
   };
 
-  watch(filterListFiles, () => {
-    currentPage.value = 0;
-    visibleItems.value = [];
-    loadItems();
-  });
-
   watch(selectedVersion, async () => {
     await loadData();
   });
@@ -254,20 +221,22 @@ export const useFileStore = defineStore("useFileStore", () => {
     await loadComparedData();
   });
 
-  watch([list, comparedList], async () => {
-    await mergeList();
-  });
-
   watch(selectedFileType, async () => {
     await loadData();
     await loadComparedData();
   });
 
-  watch(keyWordValue, () => {
-    resetLazyLoading();
+  watch([list, comparedList], async () => {
+    await mergeList();
   });
 
-  watch(selectedDiffType, () => {
+  watch(filterListFiles, () => {
+    currentPage.value = 0;
+    visibleItems.value = [];
+    loadItems();
+  });
+
+  watch([keyWordValue, selectedDiffType], () => {
     resetLazyLoading();
   });
 
