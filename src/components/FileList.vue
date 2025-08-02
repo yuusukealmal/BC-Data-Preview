@@ -1,124 +1,47 @@
 <script setup lang="ts">
-import { computed, ref, watch, type PropType } from "vue";
-import type { FileInfo, LabeledFile, List } from "../types";
-import { aesECBDecrypt } from "../utils/crypto/decrypt";
+import { onMounted, onUnmounted, ref } from "vue";
+import { useFileStore } from "../sotre/fileStore";
 
-const props = defineProps({
-  listBuffer: {
-    type: ArrayBuffer,
-  },
-  comparedListBuffer: {
-    type: ArrayBuffer,
-  },
-  keyWord: {
-    type: String,
-    required: true,
-  },
-  selectedFileInfo: {
-    type: Object as PropType<FileInfo>,
-  },
+const fileStore = useFileStore();
+const listContainer = ref<HTMLElement>();
+
+const onFileSelect = (file: any) => {
+  fileStore.setSelectedFile(file);
+};
+
+const handleScroll = () => {
+  if (!listContainer.value) return;
+
+  const { scrollTop, scrollHeight, clientHeight } = listContainer.value;
+  if (scrollTop + clientHeight >= scrollHeight - 100) {
+    fileStore.loadItems();
+  }
+};
+
+onMounted(() => {
+  listContainer.value?.addEventListener("scroll", handleScroll);
 });
 
-const emit = defineEmits(["update:selectedFileInfo"]);
-
-const list = ref<List | null>(null);
-const comparedList = ref<List | null>(null);
-const mergedList = ref<LabeledFile[]>([]);
-const selectedFileName = ref<string | null>(null);
-
-const decryptList = async () => {
-  if (!props.listBuffer) {
-    list.value = null;
-  }
-  if (!props.comparedListBuffer) {
-    comparedList.value = null;
-  }
-
-  const listResult = props.listBuffer ? aesECBDecrypt(props.listBuffer) : "";
-  list.value = {
-    files: listResult
-      .split("\n")
-      .slice(1, -1)
-      .map((item) => {
-        const [name, start, offset] = item.split(",");
-        return {
-          name,
-          start: Number(start),
-          offset: Number(offset),
-        };
-      }),
-  };
-
-  const comparedListResult = props.comparedListBuffer ? aesECBDecrypt(props.comparedListBuffer) : "";
-  comparedList.value = {
-    files: comparedListResult
-      .split("\n")
-      .slice(1, -1)
-      .map((item) => {
-        const [name, start, offset] = item.split(",");
-        return {
-          name,
-          start: Number(start),
-          offset: Number(offset),
-        };
-      }),
-  };
-};
-
-const filterListFiles = computed(() => {
-  if (!props.keyWord) {
-    return mergedList.value;
-  }
-  return mergedList.value?.filter((file) => file.info.name.includes(props.keyWord)) || [];
+onUnmounted(() => {
+  listContainer.value?.removeEventListener("scroll", handleScroll);
 });
-
-const onFileSelect = (file: FileInfo) => {
-  selectedFileName.value = file.name;
-  emit("update:selectedFileInfo", file);
-};
-
-const mergeList = async () => {
-  const listFiles = list.value?.files || [];
-  const comparedFiles = comparedList.value?.files || [];
-
-  if (comparedFiles.length === 0) {
-    mergedList.value = listFiles.map((file) => ({ info: file, label: "normal" }));
-    return;
-  }
-
-  if (listFiles.length === 0) {
-    mergedList.value = comparedFiles.map((file) => ({ info: file, label: "normal" }));
-    return;
-  }
-
-  const aMap = new Map(listFiles.map((item) => [item.name, item]));
-  const bMap = new Map(comparedFiles.map((item) => [item.name, item]));
-
-  mergedList.value = [...new Set([...aMap.keys(), ...bMap.keys()])].map((name) => {
-    const [aItem, bItem] = [aMap.get(name), bMap.get(name)];
-    const label = aItem && bItem ? "normal" : aItem ? "delete" : "add";
-    return { info: (aItem || bItem)!, label };
-  });
-};
-
-watch([() => props.listBuffer, () => props.comparedListBuffer], decryptList, { immediate: true });
-watch([list, comparedList], mergeList, { immediate: true });
 </script>
 
 <template>
   <section class="list-view">
     <div class="header">
       <h3>文件列表</h3>
-      <span class="detail-info">{{ filterListFiles.length }} 個文件</span>
+      <span class="detail-info">{{ fileStore.filterListFiles.length }} 個文件</span>
     </div>
-    <div class="file-list">
-      <template v-if="filterListFiles.length !== 0">
-        <div v-for="file in filterListFiles" :key="file.info.name" class="file-item" :class="{ active: selectedFileName === file.info.name }" @click="onFileSelect(file.info)">
-          <div class="file-name" :class="[file.label]">{{ file.info.name }}</div>
+    <div ref="listContainer" class="file-list">
+      <template v-if="fileStore.visibleItems.length !== 0">
+        <div v-for="file in fileStore.visibleItems" :key="file.info.name" class="file-item" :class="{ active: fileStore.selectedFile?.name === file.info.name }" @click="onFileSelect(file.info)">
+          <div class="file-name" :class="file.label">{{ file.info.name }}</div>
           <div class="file-info">起始位置: {{ file.info.start }} | 大小: {{ file.info.offset }}</div>
         </div>
       </template>
-      <p v-else class="no-files">沒有可用的文件</p>
+      <div v-if="fileStore.isLoading" class="loading">載入中...</div>
+      <p v-else-if="fileStore.filterListFiles.length === 0" class="no-files">沒有可用的文件</p>
     </div>
   </section>
 </template>
@@ -175,6 +98,12 @@ watch([list, comparedList], mergeList, { immediate: true });
 
 .file-info {
   font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.loading {
+  text-align: center;
+  padding: 1rem;
   color: var(--text-secondary);
 }
 </style>

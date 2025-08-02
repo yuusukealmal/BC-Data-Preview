@@ -1,42 +1,25 @@
 <script setup lang="ts">
-import { ref, watch, type PropType } from "vue";
-import { FILE_TYPE_LIST, type FileType } from "../types";
+import { FILE_STATUS, FILE_TYPE_LIST } from "../types";
+import { useFileStore } from "../sotre/fileStore";
 
-defineProps({
-  selectedFileType: {
-    type: String as PropType<FileType>,
-    required: true,
-  },
-  keyWord: {
-    type: String,
-    required: true,
-  },
-});
-
-const emit = defineEmits(["update:selectedFileType", "update:keyWord"]);
-
-const selectedFileType = ref<FileType>(FILE_TYPE_LIST[0]);
-const keyWord = ref<string>("");
-
-watch(selectedFileType, (newFileType) => {
-  emit("update:selectedFileType", newFileType);
-});
-
-watch(keyWord, (newKeyWord) => {
-  emit("update:keyWord", newKeyWord);
-});
+const fileStore = useFileStore();
 </script>
 
 <template>
   <div class="file-type-selector select-wrapper">
     <span>文件類型：</span>
-    <select v-model="selectedFileType">
+    <select v-model="fileStore.selectedFileType">
       <option v-for="fileType in FILE_TYPE_LIST" :key="fileType" :value="fileType">
         {{ fileType }}
       </option>
     </select>
     <span>篩選: </span>
-    <input v-model="keyWord" type="text" />
+    <input v-model="fileStore.keyWordValue" type="text" />
+    <select v-model="fileStore.selectedDiffType">
+      <option v-for="diffType in FILE_STATUS" :key="diffType" :value="diffType">
+        {{ diffType }}
+      </option>
+    </select>
   </div>
 </template>
 

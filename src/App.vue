@@ -2,10 +2,10 @@
 import { computed, onMounted, ref } from "vue";
 
 import { versions } from "./config/versions";
-import type { CountryCode } from "./types/index";
 
 import Manger from "./components/Manger.vue";
 import { applyTheme } from "./utils/theme";
+import { useFileStore } from "./sotre/fileStore";
 
 onMounted(() => {
   // const isDarked = localStorage.getItem("isDark");
@@ -19,9 +19,6 @@ onMounted(() => {
   applyTheme(true);
 });
 
-const selectedCC = ref<CountryCode | null>(null);
-const selectedVersion = ref<string | null>(null);
-const selectedComparedVersion = ref<string | null>(null);
 const isDark = ref(false);
 
 const countryMap = {
@@ -30,6 +27,10 @@ const countryMap = {
   EN: "國際版",
   KR: "韓文版",
 } as const;
+
+const fileStore = useFileStore();
+const selectedCC = computed(() => fileStore.selectedCC);
+
 const countryVersions = computed(() => {
   if (!selectedCC.value) return [];
   return versions[selectedCC.value]?.length > 0 ? versions[selectedCC.value] : [null];
@@ -46,18 +47,18 @@ const toggleTheme = () => {
     <div>
       <div class="select-wrapper">
         <label>選擇版本：</label>
-        <select v-model="selectedCC">
+        <select v-model="fileStore.selectedCC">
           <option v-for="(label, code) in countryMap" :key="code" :value="code">
             {{ label }}
           </option>
         </select>
-        <select v-if="selectedCC" v-model="selectedVersion">
+        <select v-if="selectedCC" v-model="fileStore.selectedVersion">
           <option v-for="version in countryVersions" :key="version || 'none'" :value="version">
             {{ version !== null ? version : "無版本可以選擇" }}
           </option>
         </select>
         <select v-else></select>
-        <select v-if="selectedCC" v-model="selectedComparedVersion">
+        <select v-if="selectedCC" v-model="fileStore.selectedComparedVersion">
           <option v-for="version in countryVersions" :key="version || 'none'" :value="version">
             {{ version !== null ? version : "無版本可以選擇" }}
           </option>
@@ -66,13 +67,12 @@ const toggleTheme = () => {
       </div>
     </div>
     <div class="theme-toggle" @click="toggleTheme">
-      <i v-if="!isDark" class="bi bi-sun-fill" style="font-size: 24px"></i>
-      <i v-if="isDark" class="bi bi-moon-fill" style="font-size: 24px"></i>
+      <i :class="isDark ? 'bi bi-moon-fill' : 'bi bi-sun-fill'" style="font-size: 24px"></i>
     </div>
   </header>
 
   <main class="main-content">
-    <Manger v-if="selectedCC && selectedVersion" :cc="selectedCC" :version="selectedVersion" :comparedVersion="selectedComparedVersion!" />
+    <Manger v-if="selectedCC && fileStore.selectedVersion" />
     <p v-else class="welcome">選擇檔案</p>
   </main>
 </template>

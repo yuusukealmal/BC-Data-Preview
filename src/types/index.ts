@@ -19,7 +19,9 @@ export interface ImageInfo {
   size: number;
 }
 
+export type FileStatus = "normal" | "delete" | "add" | "modify";
+export const FILE_STATUS: FileStatus[] = ["normal", "delete", "add", "modify"] as const;
 export type LabeledFile = {
   info: FileInfo;
-  label: "normal" | "delete" | "add" | "modify";
+  label: FileStatus;
 };

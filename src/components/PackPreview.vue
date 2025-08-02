@@ -1,26 +1,10 @@
 <script setup lang="ts">
-import { onUnmounted, ref, watch, type PropType } from "vue";
+import { computed, onUnmounted, ref, watch, type PropType } from "vue";
 
-import type { CountryCode, FileInfo, ImageInfo } from "../types";
+import type { CountryCode, ImageInfo } from "../types";
+import { useFileStore } from "../sotre/fileStore";
 import { aesCBCDecrypt } from "../utils/crypto/decrypt";
 import CodeBlock from "./CodeBlock.vue";
-
-const props = defineProps({
-  cc: {
-    type: String as PropType<CountryCode>,
-    required: true,
-  },
-  folder: {
-    type: String,
-    required: true,
-  },
-  packBuffer: {
-    type: ArrayBuffer,
-  },
-  fileInfo: {
-    type: Object as PropType<FileInfo>,
-  },
-});
 
 onUnmounted(() => {
   if (previewImageUrl.value) {
@@ -35,22 +19,26 @@ const imageInfo = ref<ImageInfo>({
   height: 0,
   size: 0,
 });
+const fileStore = useFileStore();
+
+const fileInfo = computed(() => fileStore.selectedFile);
 
 const decrypt = () => {
+  console.log("OMG");
   if (previewImageUrl.value) {
     URL.revokeObjectURL(previewImageUrl.value);
     previewImageUrl.value = null;
   }
 
-  if (!props.packBuffer) {
+  if (!fileStore.packBuffer) {
     console.warn("Pack data not available");
     previewContent.value = "Pack 數據未載入";
     return;
   }
 
   try {
-    const data = aesCBCDecrypt(props.cc, props.folder, props.fileInfo!, props.packBuffer);
-    const format = props.fileInfo!.name.split(".").pop()!;
+    const data = aesCBCDecrypt();
+    const format = fileInfo.value!.name.split(".").pop()!;
 
     if (format === "png") {
       const blob = new Blob([data], { type: "image/png" });
@@ -77,7 +65,7 @@ const decrypt = () => {
 };
 
 const copyToClipboard = async () => {
-  const file = props.fileInfo;
+  const file = fileInfo.value;
   const extension = file?.name.split(".").pop();
 
   if (extension === "png") {
@@ -96,7 +84,7 @@ ${previewContent.value}
 };
 
 const downloadFile = async () => {
-  const file = props.fileInfo;
+  const file = fileInfo.value;
   const extension = file?.name.split(".").pop();
 
   const a = document.createElement("a");
@@ -116,7 +104,7 @@ const downloadFile = async () => {
   URL.revokeObjectURL(a.href);
 };
 
-watch(() => props.fileInfo, decrypt);
+watch(fileInfo, decrypt);
 </script>
 
 <template>
@@ -143,16 +131,6 @@ watch(() => props.fileInfo, decrypt);
 </template>
 
 <style scoped>
-.no-files {
-  flex: 1;
-  height: 100%;
-  display: flex;
-  padding: 24px;
-  justify-content: center;
-  align-items: center;
-  color: var(--text-muted);
-}
-
 .preview {
   width: 100%;
   height: 100%;
