@@ -231,12 +231,6 @@ export const useFileStore = defineStore("useFileStore", () => {
   });
 
   watch(filterListFiles, () => {
-    currentPage.value = 0;
-    visibleItems.value = [];
-    loadItems();
-  });
-
-  watch([keyWordValue, selectedDiffType], () => {
     resetLazyLoading();
   });
 
