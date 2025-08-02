@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, onUnmounted, ref, watch, type PropType } from "vue";
+import { computed, onUnmounted, ref, watch } from "vue";
 
-import type { CountryCode, ImageInfo } from "../types";
+import type { ImageInfo } from "../types";
 import { useFileStore } from "../sotre/fileStore";
 import { aesCBCDecrypt } from "../utils/crypto/decrypt";
 import CodeBlock from "./CodeBlock.vue";

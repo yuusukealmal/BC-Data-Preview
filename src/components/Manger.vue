@@ -1,9 +1,4 @@
 <script setup lang="ts">
-import { watch, type PropType } from "vue";
-
-import { useFileStore } from "../sotre/fileStore";
-import { type CountryCode, FILE_TYPE_LIST } from "../types/index";
-
 import fileTypeSelector from "./fileTypeSelector.vue";
 import FileList from "./FileList.vue";
 import PackPreview from "./PackPreview.vue";

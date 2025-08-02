@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
 import { useFileStore } from "../sotre/fileStore";
+import type { FileInfo } from "../types";
 
 const fileStore = useFileStore();
 const listContainer = ref<HTMLElement>();
 
-const onFileSelect = (file: any) => {
+const onFileSelect = (file: FileInfo) => {
   fileStore.setSelectedFile(file);
 };
 

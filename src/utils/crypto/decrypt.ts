@@ -1,6 +1,6 @@
 import * as CryptoJS from "crypto-js";
 
-import type { CountryCode, FileInfo } from "../../types/index";
+import type { FileInfo } from "../../types/index";
 import { ECBKey, CBCKey } from "../../config/config";
 import { useFileStore } from "../../sotre/fileStore";
 
