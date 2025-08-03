@@ -2,7 +2,7 @@ import { useRoute } from "vue-router";
 
 import { router } from "../router";
 import type { CountryCode, FileType } from "../types";
-import { useFileStore } from "../sotre/fileStore";
+import { useFileStore } from "../store/fileStore";
 
 export const initDataByQuery = () => {
   const route = useRoute();

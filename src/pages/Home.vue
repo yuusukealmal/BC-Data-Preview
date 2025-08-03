@@ -6,7 +6,7 @@ import { versions } from "../config/versions";
 import Manger from "../components/Manger.vue";
 
 import { applyTheme } from "../utils/theme";
-import { useFileStore } from "../sotre/fileStore";
+import { useFileStore } from "../store/fileStore";
 import { initDataByQuery } from "../utils/routeController";
 
 onMounted(() => {

@@ -2,7 +2,7 @@
 import { computed, onUnmounted, ref, watch } from "vue";
 
 import type { ImageInfo } from "../types";
-import { useFileStore } from "../sotre/fileStore";
+import { useFileStore } from "../store/fileStore";
 import { aesCBCDecrypt } from "../utils/crypto/decrypt";
 import CodeBlock from "./CodeBlock.vue";
 
