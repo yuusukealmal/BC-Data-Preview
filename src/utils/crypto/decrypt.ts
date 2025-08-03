@@ -1,9 +1,10 @@
 import * as CryptoJS from "crypto-js";
 
-import type { countryCode, fileInfo } from "../../types/index";
+import type { FileInfo } from "../../types/index";
 import { ECBKey, CBCKey } from "../../config/config";
+import { useFileStore } from "../../sotre/fileStore";
 
-const crop = (buffer: ArrayBuffer, info: fileInfo) => {
+export const crop = (buffer: ArrayBuffer, info: FileInfo) => {
   return buffer.slice(info.start, info.start + info.offset);
 };
 
@@ -50,8 +51,21 @@ export const aesECBDecrypt = (buffer: ArrayBuffer) => {
   return dataArray;
 };
 
-export const aesCBCDecrypt = (cc: countryCode, info: fileInfo, buffer: ArrayBuffer) => {
-  const cropBuffer = crop(buffer, info);
+export const aesCBCDecrypt = () => {
+  const fileStore = useFileStore();
+
+  const cc = fileStore.selectedCC!;
+  const info = fileStore.selectedFile!;
+
+  const IGNORE_FORMATS = ["imgcut", "maanim", "mamodel"];
+  const format = info.name.split(".").pop()!;
+
+  const cropBuffer = crop(fileStore.packBuffer!, info);
+  if (fileStore.selectedFileType === "ImageDataLocal" && IGNORE_FORMATS.includes(format)) {
+    const dataArray = new TextDecoder("utf-8").decode(cropBuffer);
+
+    return dataArray;
+  }
 
   const key = CBCKey[cc].KEY;
   const iv = CBCKey[cc].IV;

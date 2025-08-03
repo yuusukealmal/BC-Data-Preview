@@ -17,10 +17,6 @@ const props = defineProps({
   console.log('Hello World!');
 }`,
   },
-  language: {
-    type: String,
-    default: "ts",
-  },
 });
 
 const codeBlock = ref<HTMLElement | null>(null);

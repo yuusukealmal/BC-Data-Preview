@@ -1,13 +1,27 @@
-export type countryCode = "JP" | "TW" | "EN" | "KR";
+export type CountryCode = "JP" | "TW" | "EN" | "KR";
 
-export interface fileInfo {
+export interface FileInfo {
   name: string;
   start: number;
   offset: number;
 }
 
 export interface List {
-  files: fileInfo[];
+  files: FileInfo[];
 }
 
-export type fileType = "DataLocal" | "DownloadLocal" | "ImageDataLocal" | "ImageLocal" | "MapLocal" | "NumberLocal" | "resLocal" | "UnitLocal";
+export type FileType = "DataLocal" | "DownloadLocal" | "ImageDataLocal" | "ImageLocal" | "MapLocal" | "NumberLocal" | "resLocal" | "UnitLocal";
+export const FILE_TYPE_LIST: FileType[] = ["DataLocal", "DownloadLocal", "ImageDataLocal", "ImageLocal", "MapLocal", "NumberLocal", "resLocal", "UnitLocal"] as const;
+
+export interface ImageInfo {
+  width: number;
+  height: number;
+  size: number;
+}
+
+export type FileStatus = "normal" | "delete" | "add" | "modify";
+export const FILE_STATUS: FileStatus[] = ["normal", "delete", "add", "modify"] as const;
+export type LabeledFile = {
+  info: FileInfo;
+  label: FileStatus;
+};
