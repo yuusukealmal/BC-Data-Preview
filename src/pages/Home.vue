@@ -10,11 +10,22 @@ import { useFileStore } from "../store/fileStore";
 import { initDataByQuery } from "../utils/routeController";
 
 onMounted(() => {
+  const storage = localStorage.getItem("isDark");
+  if (storage) {
+    const theme = JSON.parse(storage);
+    isDark.value = theme;
+    applyTheme(theme);
+  } else {
+    applyTheme(false);
+  }
+});
+
+onMounted(() => {
   initDataByQuery();
 });
 
-const fileStore = useFileStore();
 const isDark = ref(false);
+const fileStore = useFileStore();
 
 const countryMap = {
   JP: "日文版",
