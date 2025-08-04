@@ -65,7 +65,7 @@ const decrypt = () => {
     } else {
       const data = result.data.data as string;
 
-      previewContent.value = ["json", "preset"].includes(fileStore.selectedFile?.name!) ? JSON.stringify(JSON.parse(data), null, 2) : data;
+      previewContent.value = ["json", "preset"].includes(fileStore.selectedFile!.name!) ? JSON.stringify(JSON.parse(data), null, 2) : data;
       previewImageUrl.value = null;
     }
   } catch (error) {

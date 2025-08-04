@@ -65,7 +65,7 @@ export const useFileStore = defineStore("useFileStore", () => {
         throw new Error("Files not found");
       }
       return { list: await listResponse.arrayBuffer(), pack: await packResponse.arrayBuffer() };
-    } catch (error) {
+    } catch {
       return { list: undefined, pack: undefined };
     }
   };

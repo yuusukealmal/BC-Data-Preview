@@ -49,7 +49,8 @@ const deletePadding = (packRes: Uint8Array): Uint8Array => {
   return paddingCount > 0 ? packRes.slice(0, -paddingCount) : packRes;
 };
 
-const compareData = (lhs: string | Uint8Array, rhs: string | Uint8Array) => {
+type comparedType = string | Uint8Array | null;
+const compareData = (lhs: comparedType, rhs: comparedType) => {
   if (lhs === null || rhs === null) return lhs === rhs;
 
   if (typeof lhs === "string" && typeof rhs === "string") {
@@ -115,8 +116,8 @@ const getPack = (list?: List | null, pack?: ArrayBuffer) => {
 export const getData = () => {
   const fileStore = useFileStore();
 
-  let mainData: any;
-  let comparedData: any;
+  let mainData: comparedType = null;
+  let comparedData: comparedType = null;
 
   if (fileStore.packBuffer) mainData = getPack(fileStore.list, fileStore.packBuffer);
   if (fileStore.comparedPackBuffer) comparedData = getPack(fileStore.comparedList, fileStore.comparedPackBuffer);
