@@ -77,7 +77,6 @@ export const getList = (buffer: ArrayBuffer) => {
   });
 
   const dataArray = data.toString(CryptoJS.enc.Utf8);
-  // console.log(dataArray);
   return dataArray;
 };
 

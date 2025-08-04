@@ -51,7 +51,6 @@ const decrypt = () => {
 
   try {
     const result = getData();
-    console.log(result);
 
     if (result.type === "image") {
       const data = result.data.data as ArrayBuffer;
