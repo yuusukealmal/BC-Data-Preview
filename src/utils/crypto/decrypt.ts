@@ -86,13 +86,11 @@ const getPack = (list?: List | null, pack?: ArrayBuffer) => {
 
   const cc = fileStore.selectedCC!;
 
-  const IGNORE_FORMATS = ["imgcut", "maanim", "mamodel"];
-
   const fileInfo = list?.files.find((f) => f.name === fileStore.selectedFile!.name);
   if (fileInfo && pack) {
     const cropBuffer = crop(pack, fileInfo);
 
-    if (fileStore.selectedFileType === "ImageDataLocal" && IGNORE_FORMATS.includes(fileInfo.name)) {
+    if (fileStore.selectedFileType === "ImageDataLocal") {
       return new TextDecoder("utf-8").decode(cropBuffer);
     } else {
       const data = aesCBCDecrypt(cc, cropBuffer);
