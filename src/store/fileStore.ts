@@ -2,7 +2,7 @@ import { ref, computed, watch } from "vue";
 import { defineStore } from "pinia";
 
 import { type CountryCode, type FileType, type FileInfo, type List, type LabeledFile, type FileStatus, FILE_TYPE_LIST } from "../types";
-import { aesECBDecrypt } from "../utils/crypto/decrypt";
+import { getList } from "../utils/crypto/decrypt";
 import { getFileHash } from "../utils/crypto/md5Hash";
 import { setQuery } from "../utils/routeController";
 
@@ -91,7 +91,7 @@ export const useFileStore = defineStore("useFileStore", () => {
   };
 
   const decryptFileList = (buffer: ArrayBuffer | undefined): List => {
-    const rawData = buffer ? aesECBDecrypt(buffer) : "";
+    const rawData = buffer ? getList(buffer) : "";
     return {
       files: rawData
         .split("\n")
@@ -244,7 +244,10 @@ export const useFileStore = defineStore("useFileStore", () => {
     keyWordValue,
     selectedDiffType,
     selectedFile,
+    list,
+    comparedList,
     packBuffer,
+    comparedPackBuffer,
     visibleItems,
     isLoading,
 

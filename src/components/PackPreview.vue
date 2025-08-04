@@ -3,12 +3,16 @@ import { computed, onUnmounted, ref, watch } from "vue";
 
 import type { ImageInfo } from "../types";
 import { useFileStore } from "../store/fileStore";
-import { aesCBCDecrypt } from "../utils/crypto/decrypt";
+import { getData } from "../utils/crypto/decrypt";
 import CodeBlock from "./CodeBlock.vue";
+import { createImage } from "../utils/imageCreate";
 
 onUnmounted(() => {
   if (previewImageUrl.value) {
     URL.revokeObjectURL(previewImageUrl.value);
+  }
+  if (comparedPreviewImageUrl.value) {
+    URL.revokeObjectURL(comparedPreviewImageUrl.value);
   }
 });
 
@@ -19,14 +23,24 @@ const imageInfo = ref<ImageInfo>({
   height: 0,
   size: 0,
 });
-const fileStore = useFileStore();
+const comparedPreviewImageUrl = ref<string | null>(null);
+const comparedImageInfo = ref<ImageInfo>({
+  width: 0,
+  height: 0,
+  size: 0,
+});
 
+const fileStore = useFileStore();
 const fileInfo = computed(() => fileStore.selectedFile);
 
 const decrypt = () => {
   if (previewImageUrl.value) {
     URL.revokeObjectURL(previewImageUrl.value);
     previewImageUrl.value = null;
+  }
+  if (comparedPreviewImageUrl.value) {
+    URL.revokeObjectURL(comparedPreviewImageUrl.value);
+    comparedPreviewImageUrl.value = null;
   }
 
   if (!fileStore.packBuffer) {
@@ -36,25 +50,23 @@ const decrypt = () => {
   }
 
   try {
-    const data = aesCBCDecrypt();
-    const format = fileInfo.value!.name.split(".").pop()!;
+    const result = getData();
+    console.log(result);
 
-    if (format === "png") {
-      const blob = new Blob([data], { type: "image/png" });
-      previewImageUrl.value = URL.createObjectURL(blob);
+    if (result.type === "image") {
+      const data = result.data.data as ArrayBuffer;
+      const comparedData = result.data.comparedData as ArrayBuffer;
+
+      createImage(data, previewImageUrl, comparedImageInfo);
+      if (!result.same) {
+        createImage(comparedData, comparedPreviewImageUrl, imageInfo);
+      }
+
       previewContent.value = null;
-
-      const img = new Image();
-      img.src = URL.createObjectURL(blob);
-      img.onload = () => {
-        imageInfo.value = {
-          width: img.width,
-          height: img.height,
-          size: Math.round(((data as ArrayBuffer).byteLength / 1024) * 100) / 100,
-        };
-      };
     } else {
-      previewContent.value = ["json", "preset"].includes(format) ? JSON.stringify(JSON.parse(data as string), null, 2) : (data as string);
+      const data = result.data.data as string;
+
+      previewContent.value = ["json", "preset"].includes(fileStore.selectedFile?.name!) ? JSON.stringify(JSON.parse(data), null, 2) : data;
       previewImageUrl.value = null;
     }
   } catch (error) {
@@ -118,14 +130,14 @@ watch(fileInfo, decrypt);
     </div>
     <div class="preview-content">
       <div v-if="fileInfo" class="preview">
-        <div v-if="previewImageUrl" class="image-wrapper">
-          <div>
+        <div v-if="previewImageUrl || comparedPreviewImageUrl" class="image-wrapper">
+          <div v-if="previewImageUrl">
             <img :src="previewImageUrl" :alt="fileInfo.name" />
             <span>W: {{ imageInfo.width }}px | H: {{ imageInfo.height }}px | Size: {{ imageInfo.size }} Kib</span>
           </div>
-          <div>
-            <img :src="previewImageUrl" :alt="fileInfo.name" />
-            <span>W: {{ imageInfo.width }}px | H: {{ imageInfo.height }}px | Size: {{ imageInfo.size }} Kib</span>
+          <div v-if="comparedPreviewImageUrl">
+            <img :src="comparedPreviewImageUrl" :alt="fileInfo.name" />
+            <span>W: {{ comparedImageInfo.width }}px | H: {{ comparedImageInfo.height }}px | Size: {{ comparedImageInfo.size }} Kib</span>
           </div>
         </div>
         <CodeBlock v-else :code="previewContent!" />
@@ -164,8 +176,8 @@ watch(fileInfo, decrypt);
 
   img {
     border: 1px solid rgba(255, 0, 0, 0.5);
-    max-width: calc(100% - 20px);
-    max-height: calc(100% - 40px);
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
   }
 }
