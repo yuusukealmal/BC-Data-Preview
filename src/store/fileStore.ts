@@ -17,9 +17,7 @@ export const useFileStore = defineStore("useFileStore", () => {
   const selectedFile = ref<FileInfo>();
 
   // buffer
-  const listBuffer = ref<ArrayBuffer>();
   const packBuffer = ref<ArrayBuffer>();
-  const comparedListBuffer = ref<ArrayBuffer>();
   const comparedPackBuffer = ref<ArrayBuffer>();
 
   // decrypted list
@@ -73,21 +71,18 @@ export const useFileStore = defineStore("useFileStore", () => {
   const loadData = async () => {
     if (!selectedVersion.value) return;
     const result = await loadFileData(selectedVersion.value);
-    listBuffer.value = result.list;
+    list.value = decryptFileList(result.list);
     packBuffer.value = result.pack;
-    decryptList();
   };
 
   const loadComparedData = async () => {
     if (!selectedComparedVersion.value) {
-      comparedListBuffer.value = undefined;
       comparedPackBuffer.value = undefined;
       return;
     }
     const result = await loadFileData(selectedComparedVersion.value);
-    comparedListBuffer.value = result.list;
+    comparedList.value = decryptFileList(result.list);
     comparedPackBuffer.value = result.pack;
-    decryptComparedList();
   };
 
   const decryptFileList = (buffer: ArrayBuffer | undefined): List => {
@@ -105,14 +100,6 @@ export const useFileStore = defineStore("useFileStore", () => {
           };
         }),
     };
-  };
-
-  const decryptList = () => {
-    list.value = decryptFileList(listBuffer.value);
-  };
-
-  const decryptComparedList = () => {
-    comparedList.value = decryptFileList(comparedListBuffer.value);
   };
 
   const calcFileStatus = async (fileName: string, currentFile?: FileInfo, comparedFile?: FileInfo): Promise<FileStatus> => {
