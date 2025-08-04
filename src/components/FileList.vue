@@ -93,7 +93,7 @@ onUnmounted(() => {
   }
 
   &.normal {
-    color: #fff;
+    color: var(--text-primary);
   }
 }
 

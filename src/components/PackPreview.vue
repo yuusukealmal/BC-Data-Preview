@@ -118,9 +118,15 @@ watch(fileInfo, decrypt);
     </div>
     <div class="preview-content">
       <div v-if="fileInfo" class="preview">
-        <div v-if="previewImageUrl" class="image-preview">
-          <img :src="previewImageUrl" :alt="fileInfo.name" />
-          <span class="image-info">W: {{ imageInfo.width }}px | H: {{ imageInfo.height }}px | Size: {{ imageInfo.size }} Kib</span>
+        <div v-if="previewImageUrl" class="image-wrapper">
+          <div>
+            <img :src="previewImageUrl" :alt="fileInfo.name" />
+            <span>W: {{ imageInfo.width }}px | H: {{ imageInfo.height }}px | Size: {{ imageInfo.size }} Kib</span>
+          </div>
+          <div>
+            <img :src="previewImageUrl" :alt="fileInfo.name" />
+            <span>W: {{ imageInfo.width }}px | H: {{ imageInfo.height }}px | Size: {{ imageInfo.size }} Kib</span>
+          </div>
         </div>
         <CodeBlock v-else :code="previewContent!" />
       </div>
@@ -136,19 +142,31 @@ watch(fileInfo, decrypt);
   overflow: auto;
 }
 
-.image-preview {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-}
+.image-wrapper {
+  & {
+    height: 100%;
+    display: flex;
+    overflow: hidden;
+  }
 
-.image-info {
-  margin-top: 0.5em;
-  opacity: 0.3;
-  flex-direction: column;
-  justify-content: center;
+  div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  span {
+    margin-top: 0.5em;
+    opacity: 0.3;
+  }
+
+  img {
+    border: 1px solid rgba(255, 0, 0, 0.5);
+    max-width: calc(100% - 20px);
+    max-height: calc(100% - 40px);
+    object-fit: contain;
+  }
 }
 </style>
