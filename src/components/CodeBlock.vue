@@ -19,36 +19,37 @@ const props = defineProps({
   lang: {
     type: String,
     required: true,
-    default: "ts",
   },
 });
 
 const isDark = inject<Ref<boolean>>("isDark");
 const currentTheme = computed(() => (isDark!.value ? "github-dark" : "github-light"));
 
-const highlightedHtml = ref("");
+const highlightedHtml = ref<HTMLDivElement | null>(null);
 let highlighter: HighlighterGeneric<BundledLanguage, BundledTheme> | null = null;
 
 const highlight = async () => {
+  if (!highlightedHtml.value) return;
+
   highlighter = await createHighlighter({
     themes: ["github-dark", "github-light"],
     langs: langs,
   });
   try {
     if (!props.preview && !props.comparedPreview) {
-      highlightedHtml.value = renderDefault(highlighter, props.lang, currentTheme.value);
+      highlightedHtml.value!.innerHTML = renderDefault(highlighter, currentTheme.value);
     }
     if (props.preview && props.comparedPreview) {
       const diffLines = countDiffLines(props.preview, props.comparedPreview);
-      highlightedHtml.value = renderDiffHtml(diffLines, highlighter, props.lang, currentTheme.value);
+      highlightedHtml.value!.innerHTML = renderDiffHtml(diffLines, highlighter, props.lang, currentTheme.value);
     } else if (props.preview) {
-      highlightedHtml.value = renderHtml(highlighter, props.preview, props.lang, currentTheme.value);
+      highlightedHtml.value!.innerHTML = renderHtml(highlighter, props.preview, props.lang, currentTheme.value);
     } else {
-      highlightedHtml.value = renderHtml(highlighter, props.comparedPreview, props.lang, currentTheme.value);
+      highlightedHtml.value!.innerHTML = renderHtml(highlighter, props.comparedPreview, props.lang, currentTheme.value);
     }
   } catch (error) {
     console.log("Display Code", error);
-    highlightedHtml.value = renderDefault(highlighter, props.lang, currentTheme.value);
+    highlightedHtml.value!.innerHTML = renderDefault(highlighter, currentTheme.value);
   }
 };
 
@@ -73,7 +74,7 @@ watch(
 </script>
 
 <template>
-  <div class="code-wrapper" v-html="highlightedHtml" />
+  <div ref="highlightedHtml" class="code-wrapper" />
 </template>
 
 <style>

@@ -28,12 +28,12 @@ const addLineNumbers = (html: string): string => {
   return wrapper.innerHTML;
 };
 
-export const renderDefault = (highlighter: HighlighterGeneric<BundledLanguage, BundledTheme> | null, lang: string, theme: string) => {
+export const renderDefault = (highlighter: HighlighterGeneric<BundledLanguage, BundledTheme> | null, theme: string) => {
   if (!highlighter) return "";
 
   const defaultContent = 'const greet = () => {\n    console.log("Hello, world!");\n};\n\ngreet();';
   try {
-    return renderHtml(highlighter, defaultContent, lang, theme);
+    return renderHtml(highlighter, defaultContent, "ts", theme);
   } catch {
     return `<pre><code>${defaultContent}</code></pre>`;
   }
@@ -55,7 +55,7 @@ export const renderHtml = (highlighter: HighlighterGeneric<BundledLanguage, Bund
 };
 
 export const renderDiffHtml = (diffLines: FileDiffLines[], highlighter: HighlighterGeneric<BundledLanguage, BundledTheme> | null, lang: string, theme: string) => {
-  if (!highlighter) return renderDefault(highlighter, lang, theme);
+  if (!highlighter) return renderDefault(highlighter, theme);
 
   const diffHtml = diffLines
     .map((line) => {
