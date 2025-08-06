@@ -10,11 +10,11 @@ import { langs } from "../utils/diff/lang";
 const props = defineProps({
   preview: {
     type: String,
-    default: "",
+    required: true,
   },
   comparedPreview: {
     type: String,
-    default: "",
+    required: true,
   },
   lang: {
     type: String,
