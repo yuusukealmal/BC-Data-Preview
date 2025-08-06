@@ -105,45 +105,45 @@ watch(
   white-space: pre;
 }
 
-.code-wrapper {
-  &.old-line-num {
-    background-color: #21262d;
-    border-right: 1px solid #30363d;
-  }
-
-  &.new-line-num {
-    background-color: #161b22;
-    border-right: 1px solid #30363d;
-  }
+.code-wrapper .old-line-num {
+  background-color: var(--old-line-number-background);
+  border-right: 1px solid #30363d;
+}
+.code-wrapper .new-line-num {
+  background-color: var(--new-line-number-background);
+  border-right: 1px solid #30363d;
 }
 
 .code-wrapper .diff-line {
   display: flex;
   min-height: 1.5em;
   line-height: 1.5em;
+}
 
-  &.diff-added {
-    background-color: #0d4429;
+.code-wrapper .diff-line.diff-added {
+  background-color: var(--diff-line-add-background);
+}
+.code-wrapper .diff-line.diff-added .line-content::before {
+  content: "+ ";
+  color: var(--diff-before-mark-color);
+  font-weight: bold;
+  opacity: 0.7;
+}
 
-    &.line-content::before {
-      content: "+ ";
-      color: #238636;
-      font-weight: bold;
-    }
-  }
+.code-wrapper .diff-line.diff-removed {
+  background-color: var(--diff-line-remove-background);
+}
+.code-wrapper .diff-line.diff-removed .line-content::before {
+  content: "- ";
+  color: var(--diff-before-mark-color);
+  font-weight: bold;
+  opacity: 0.7;
+}
 
-  &.diff-removed {
-    background-color: #5a1e1e;
-
-    &.line-content::before {
-      content: "- ";
-      color: #da3633;
-      font-weight: bold;
-    }
-  }
-
-  &.diff-unchanged {
-    background-color: transparent;
-  }
+.code-wrapper .diff-line.diff-unchanged {
+  background-color: transparent;
+}
+.code-wrapper .diff-line.diff-unchanged .line-content::before {
+  content: "  ";
 }
 </style>
