@@ -4,6 +4,7 @@ import { defineStore } from "pinia";
 import { type CountryCode, type FileType, type FileInfo, type List, type LabeledFile, type FileStatus, FILE_TYPE_LIST } from "../types";
 import { aesECBDecrypt } from "../utils/crypto/decrypt";
 import { getFileHash } from "../utils/crypto/md5Hash";
+import { setQuery } from "../utils/routeController";
 
 export const useFileStore = defineStore("useFileStore", () => {
   // state
@@ -233,6 +234,7 @@ export const useFileStore = defineStore("useFileStore", () => {
   watch(filterListFiles, () => {
     resetLazyLoading();
   });
+  watch([selectedCC, selectedVersion, selectedComparedVersion, selectedFileType, selectedFile], setQuery);
 
   return {
     selectedCC,

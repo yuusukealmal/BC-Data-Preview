@@ -14,7 +14,8 @@
     "pinia": "^3.0.3",
     "prismjs": "^1.30.0",
     "vue": "^3.5.17",
-    "vue-prism-component": "^2.0.0"
+    "vue-prism-component": "^2.0.0",
+    "vue-router": "^4.5.1"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.2.2",

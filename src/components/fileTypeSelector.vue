@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { FILE_STATUS, FILE_TYPE_LIST } from "../types";
-import { useFileStore } from "../sotre/fileStore";
+import { useFileStore } from "../store/fileStore";
 
 const fileStore = useFileStore();
 </script>

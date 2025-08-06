@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
-import { useFileStore } from "../sotre/fileStore";
+import { useFileStore } from "../store/fileStore";
 import type { FileInfo } from "../types";
 
 const fileStore = useFileStore();

@@ -2,7 +2,7 @@ import * as CryptoJS from "crypto-js";
 
 import type { FileInfo } from "../../types/index";
 import { ECBKey, CBCKey } from "../../config/config";
-import { useFileStore } from "../../sotre/fileStore";
+import { useFileStore } from "../../store/fileStore";
 
 export const crop = (buffer: ArrayBuffer, info: FileInfo) => {
   return buffer.slice(info.start, info.start + info.offset);
