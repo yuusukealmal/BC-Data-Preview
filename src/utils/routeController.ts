@@ -8,19 +8,12 @@ export const initDataByQuery = () => {
   const route = useRoute();
   const fileStore = useFileStore();
 
-  const { cc, version, compared, type, file } = route.query;
+  const { cc, version, compared, type } = route.query;
 
   fileStore.selectedCC = cc as CountryCode;
   fileStore.selectedVersion = version as string;
   fileStore.selectedComparedVersion = compared as string;
   fileStore.selectedFileType = (type as FileType) ?? "DataLocal";
-
-  setTimeout(() => {
-    const retryTarget = fileStore.filterListFiles.find((f) => f.info.name === file);
-    if (retryTarget) {
-      fileStore.setSelectedFile(retryTarget.info);
-    }
-  }, 1000);
 };
 
 export const setQuery = () => {
