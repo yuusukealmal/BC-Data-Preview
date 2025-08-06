@@ -97,6 +97,7 @@ watch(
   text-align: right;
   color: var(--diff-line-number);
   user-select: none;
+  flex-shrink: 0;
 }
 
 .code-wrapper .line-content {
