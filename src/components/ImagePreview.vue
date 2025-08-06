@@ -1,4 +1,3 @@
-@ -0,0 +1,64 @@
 <script setup lang="ts">
 import { computed, type PropType } from "vue";
 import { useFileStore } from "../store/fileStore";
