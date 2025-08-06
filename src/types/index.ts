@@ -13,6 +13,10 @@ export interface List {
 export type FileType = "DataLocal" | "DownloadLocal" | "ImageDataLocal" | "ImageLocal" | "MapLocal" | "NumberLocal" | "resLocal" | "UnitLocal";
 export const FILE_TYPE_LIST: FileType[] = ["DataLocal", "DownloadLocal", "ImageDataLocal", "ImageLocal", "MapLocal", "NumberLocal", "resLocal", "UnitLocal"] as const;
 
+export interface PreviewImage {
+  url: string | null;
+  info: ImageInfo;
+}
 export interface ImageInfo {
   width: number;
   height: number;

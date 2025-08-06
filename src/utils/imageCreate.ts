@@ -1,14 +1,18 @@
 import type { Ref } from "vue";
-import type { ImageInfo } from "../types";
+import type { PreviewImage } from "../types";
 
-export const createImage = (imageData: ArrayBuffer, urlRef: Ref<string | null>, infoRef: Ref<ImageInfo>) => {
+export const createImage = (imageData: ArrayBuffer, imageRef: Ref<PreviewImage>) => {
+  if (!imageData) {
+    return;
+  }
+
   const blob = new Blob([imageData], { type: "image/png" });
-  urlRef.value = URL.createObjectURL(blob);
+  imageRef.value.url = URL.createObjectURL(blob);
 
   const img = new Image();
-  img.src = urlRef.value;
+  img.src = imageRef.value.url;
   img.onload = () => {
-    infoRef.value = {
+    imageRef.value.info = {
       width: img.width,
       height: img.height,
       size: Math.round((imageData.byteLength / 1024) * 100) / 100,
