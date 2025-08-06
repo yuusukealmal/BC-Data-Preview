@@ -10,11 +10,11 @@ import { langs } from "../utils/diff/lang";
 const props = defineProps({
   preview: {
     type: String,
-    required: true,
+    default: "",
   },
   comparedPreview: {
     type: String,
-    required: true,
+    default: "",
   },
   lang: {
     type: String,
@@ -92,7 +92,7 @@ watch(
   font-family: inherit;
 }
 
-.code-wrapper .diff-line-number {
+.code-wrapper .line-number {
   width: 3em;
   padding: 0 8px;
   text-align: right;
@@ -116,36 +116,36 @@ watch(
   border-right: 1px solid #30363d;
 }
 
-.code-wrapper .diff-line {
+.code-wrapper .file-line {
   display: flex;
   min-height: 1.5em;
   line-height: 1.5em;
 }
 
-.code-wrapper .diff-line.diff-added {
+.code-wrapper .file-line.diff-added {
   background-color: var(--diff-line-add-background);
 }
-.code-wrapper .diff-line.diff-added .line-content::before {
+.code-wrapper .file-line.diff-added .line-content::before {
   content: "+ ";
   color: var(--diff-before-mark-color);
   font-weight: bold;
   opacity: 0.7;
 }
 
-.code-wrapper .diff-line.diff-removed {
+.code-wrapper .file-line.diff-removed {
   background-color: var(--diff-line-remove-background);
 }
-.code-wrapper .diff-line.diff-removed .line-content::before {
+.code-wrapper .file-line.diff-removed .line-content::before {
   content: "- ";
   color: var(--diff-before-mark-color);
   font-weight: bold;
   opacity: 0.7;
 }
 
-.code-wrapper .diff-line.diff-unchanged {
+.code-wrapper .file-line.diff-unchanged {
   background-color: transparent;
 }
-.code-wrapper .diff-line.diff-unchanged .line-content::before {
+.code-wrapper .file-line.diff-unchanged .line-content::before {
   content: "  ";
 }
 </style>

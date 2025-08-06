@@ -144,7 +144,7 @@ watch(fileInfo, decrypt);
     <div class="preview-content">
       <div v-if="fileInfo" class="preview">
         <ImagePreview v-if="previewImage.url || comparedImage.url" :previewImage="previewImage" :comparedPreviewImage="comparedImage" />
-        <CodeBlock v-if="previewContent && comparedContent" :preview="previewContent" :comparedPreview="comparedContent" :lang="getFileLang(fileInfo.name)" />
+        <CodeBlock v-if="previewContent || comparedContent" :preview="previewContent?.trim()" :comparedPreview="comparedContent?.trim()" :lang="getFileLang(fileInfo.name)" />
       </div>
       <p v-else class="no-files">未選擇文件</p>
     </div>
