@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, provide, ref } from "vue";
 
 import { versions } from "../config/versions";
 
@@ -10,11 +10,24 @@ import { useFileStore } from "../store/fileStore";
 import { initDataByQuery } from "../utils/routeController";
 
 onMounted(() => {
+  const storage = localStorage.getItem("isDark");
+  if (storage) {
+    const theme = JSON.parse(storage);
+    isDark.value = theme;
+    applyTheme(theme);
+  } else {
+    applyTheme(false);
+  }
+});
+
+onMounted(() => {
   initDataByQuery();
 });
 
-const fileStore = useFileStore();
 const isDark = ref(false);
+provide("isDark", isDark);
+
+const fileStore = useFileStore();
 
 const countryMap = {
   JP: "日文版",

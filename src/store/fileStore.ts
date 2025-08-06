@@ -2,7 +2,7 @@ import { ref, computed, watch } from "vue";
 import { defineStore } from "pinia";
 
 import { type CountryCode, type FileType, type FileInfo, type List, type LabeledFile, type FileStatus, FILE_TYPE_LIST } from "../types";
-import { aesECBDecrypt } from "../utils/crypto/decrypt";
+import { getList } from "../utils/crypto/decrypt";
 import { getFileHash } from "../utils/crypto/md5Hash";
 import { setQuery } from "../utils/routeController";
 
@@ -17,9 +17,7 @@ export const useFileStore = defineStore("useFileStore", () => {
   const selectedFile = ref<FileInfo>();
 
   // buffer
-  const listBuffer = ref<ArrayBuffer>();
   const packBuffer = ref<ArrayBuffer>();
-  const comparedListBuffer = ref<ArrayBuffer>();
   const comparedPackBuffer = ref<ArrayBuffer>();
 
   // decrypted list
@@ -65,7 +63,7 @@ export const useFileStore = defineStore("useFileStore", () => {
         throw new Error("Files not found");
       }
       return { list: await listResponse.arrayBuffer(), pack: await packResponse.arrayBuffer() };
-    } catch (error) {
+    } catch {
       return { list: undefined, pack: undefined };
     }
   };
@@ -73,25 +71,22 @@ export const useFileStore = defineStore("useFileStore", () => {
   const loadData = async () => {
     if (!selectedVersion.value) return;
     const result = await loadFileData(selectedVersion.value);
-    listBuffer.value = result.list;
+    list.value = decryptFileList(result.list);
     packBuffer.value = result.pack;
-    decryptList();
   };
 
   const loadComparedData = async () => {
     if (!selectedComparedVersion.value) {
-      comparedListBuffer.value = undefined;
       comparedPackBuffer.value = undefined;
       return;
     }
     const result = await loadFileData(selectedComparedVersion.value);
-    comparedListBuffer.value = result.list;
+    comparedList.value = decryptFileList(result.list);
     comparedPackBuffer.value = result.pack;
-    decryptComparedList();
   };
 
   const decryptFileList = (buffer: ArrayBuffer | undefined): List => {
-    const rawData = buffer ? aesECBDecrypt(buffer) : "";
+    const rawData = buffer ? getList(buffer) : "";
     return {
       files: rawData
         .split("\n")
@@ -105,14 +100,6 @@ export const useFileStore = defineStore("useFileStore", () => {
           };
         }),
     };
-  };
-
-  const decryptList = () => {
-    list.value = decryptFileList(listBuffer.value);
-  };
-
-  const decryptComparedList = () => {
-    comparedList.value = decryptFileList(comparedListBuffer.value);
   };
 
   const calcFileStatus = async (fileName: string, currentFile?: FileInfo, comparedFile?: FileInfo): Promise<FileStatus> => {
@@ -244,7 +231,10 @@ export const useFileStore = defineStore("useFileStore", () => {
     keyWordValue,
     selectedDiffType,
     selectedFile,
+    list,
+    comparedList,
     packBuffer,
+    comparedPackBuffer,
     visibleItems,
     isLoading,
 

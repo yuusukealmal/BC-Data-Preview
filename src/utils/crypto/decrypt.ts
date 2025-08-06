@@ -1,11 +1,27 @@
 import * as CryptoJS from "crypto-js";
 
-import type { FileInfo } from "../../types/index";
+import type { CountryCode, FileInfo, List } from "../../types/index";
 import { ECBKey, CBCKey } from "../../config/config";
 import { useFileStore } from "../../store/fileStore";
 
 export const crop = (buffer: ArrayBuffer, info: FileInfo) => {
   return buffer.slice(info.start, info.start + info.offset);
+};
+
+const aesCBCDecrypt = (cc: CountryCode, buffer: ArrayBuffer) => {
+  const key = CBCKey[cc].KEY;
+  const iv = CBCKey[cc].IV;
+
+  const cipher = CryptoJS.lib.WordArray.create(buffer);
+  const params = CryptoJS.lib.CipherParams.create({
+    ciphertext: cipher,
+  });
+
+  return CryptoJS.AES.decrypt(params, key, {
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.NoPadding,
+    iv: iv,
+  });
 };
 
 const deletePadding = (packRes: Uint8Array): Uint8Array => {
@@ -33,7 +49,22 @@ const deletePadding = (packRes: Uint8Array): Uint8Array => {
   return paddingCount > 0 ? packRes.slice(0, -paddingCount) : packRes;
 };
 
-export const aesECBDecrypt = (buffer: ArrayBuffer) => {
+type comparedType = string | Uint8Array | null;
+const compareData = (lhs: comparedType, rhs: comparedType) => {
+  if (lhs === null || rhs === null) return lhs === rhs;
+
+  if (typeof lhs === "string" && typeof rhs === "string") {
+    return lhs === rhs;
+  }
+
+  if (lhs instanceof Uint8Array && rhs instanceof Uint8Array) {
+    return lhs.length === rhs.length && lhs.every((val, i) => val === rhs[i]);
+  }
+
+  return false;
+};
+
+export const getList = (buffer: ArrayBuffer) => {
   const key = ECBKey.LIST_KEY;
 
   const ciphter = CryptoJS.lib.WordArray.create(buffer);
@@ -47,51 +78,52 @@ export const aesECBDecrypt = (buffer: ArrayBuffer) => {
   });
 
   const dataArray = data.toString(CryptoJS.enc.Utf8);
-  // console.log(dataArray);
   return dataArray;
 };
 
-export const aesCBCDecrypt = () => {
+const getPack = (list?: List | null, pack?: ArrayBuffer) => {
   const fileStore = useFileStore();
 
   const cc = fileStore.selectedCC!;
-  const info = fileStore.selectedFile!;
 
-  const IGNORE_FORMATS = ["imgcut", "maanim", "mamodel"];
-  const format = info.name.split(".").pop()!;
+  const fileInfo = list?.files.find((f) => f.name === fileStore.selectedFile!.name);
+  if (fileInfo && pack) {
+    const cropBuffer = crop(pack, fileInfo);
 
-  const cropBuffer = crop(fileStore.packBuffer!, info);
-  if (fileStore.selectedFileType === "ImageDataLocal" && IGNORE_FORMATS.includes(format)) {
-    const dataArray = new TextDecoder("utf-8").decode(cropBuffer);
+    if (fileStore.selectedFileType === "ImageDataLocal") {
+      return new TextDecoder("utf-8").decode(cropBuffer);
+    } else {
+      const data = aesCBCDecrypt(cc, cropBuffer);
 
-    return dataArray;
+      const array = new Uint8Array(data.sigBytes);
+      for (let i = 0; i < data.sigBytes; i++) {
+        array[i] = (data.words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
+      }
+      const dataArray = deletePadding(array);
+
+      if (fileInfo.name.endsWith(".png")) {
+        return dataArray;
+      } else {
+        return new TextDecoder("utf-8").decode(dataArray);
+      }
+    }
   }
+  return null;
+};
 
-  const key = CBCKey[cc].KEY;
-  const iv = CBCKey[cc].IV;
+export const getData = () => {
+  const fileStore = useFileStore();
 
-  const cipher = CryptoJS.lib.WordArray.create(cropBuffer);
-  const params = CryptoJS.lib.CipherParams.create({
-    ciphertext: cipher,
-  });
+  let mainData: comparedType = null;
+  let comparedData: comparedType = null;
 
-  const data = CryptoJS.AES.decrypt(params, key, {
-    mode: CryptoJS.mode.CBC,
-    padding: CryptoJS.pad.NoPadding,
-    iv: iv,
-  });
+  if (fileStore.packBuffer) mainData = getPack(fileStore.list, fileStore.packBuffer);
+  if (fileStore.comparedPackBuffer) comparedData = getPack(fileStore.comparedList, fileStore.comparedPackBuffer);
 
-  const array = new Uint8Array(data.sigBytes);
-  for (let i = 0; i < data.sigBytes; i++) {
-    array[i] = (data.words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
-  }
-  const dataArray = deletePadding(array);
-
-  if (info.name.endsWith(".png")) {
-    return dataArray;
+  const same = compareData(mainData, comparedData);
+  if (fileStore.selectedFile!.name.endsWith(".png")) {
+    return { type: "image", same, data: { data: mainData, comparedData } };
   } else {
-    const dataString = new TextDecoder("utf-8").decode(dataArray);
-    // console.log(dataString);
-    return dataString;
+    return { type: "string", same, data: { data: mainData, comparedData } };
   }
 };

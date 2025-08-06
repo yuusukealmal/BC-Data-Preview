@@ -21,14 +21,14 @@ import PackPreview from "./PackPreview.vue";
   overflow: hidden;
   box-shadow: var(--shadow-lg);
   background: var(--bg-primary);
-}
 
-.list-view {
-  flex: 1;
-}
+  .list-view {
+    flex: 1;
+  }
 
-.pack-view {
-  flex: 2;
+  .pack-view {
+    flex: 2;
+  }
 }
 
 /*

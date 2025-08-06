@@ -1,32 +1,56 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from "vue";
 
-import type { ImageInfo } from "../types";
+import type { PreviewImage } from "../types";
+
 import { useFileStore } from "../store/fileStore";
-import { aesCBCDecrypt } from "../utils/crypto/decrypt";
+
+import { getData } from "../utils/crypto/decrypt";
+import { createImage } from "../utils/imageCreate";
+import { getFileLang } from "../utils/diff/lang";
+
+import ImagePreview from "./ImagePreview.vue";
 import CodeBlock from "./CodeBlock.vue";
 
 onUnmounted(() => {
-  if (previewImageUrl.value) {
-    URL.revokeObjectURL(previewImageUrl.value);
+  if (previewImage.value.url) {
+    URL.revokeObjectURL(previewImage.value.url);
+  }
+  if (comparedImage.value.url) {
+    URL.revokeObjectURL(comparedImage.value.url);
   }
 });
 
 const previewContent = ref<string | null>(null);
-const previewImageUrl = ref<string | null>(null);
-const imageInfo = ref<ImageInfo>({
-  width: 0,
-  height: 0,
-  size: 0,
+const comparedContent = ref<string | null>(null);
+const previewImage = ref<PreviewImage>({
+  url: null,
+  info: {
+    width: 0,
+    height: 0,
+    size: 0,
+  },
 });
-const fileStore = useFileStore();
+const comparedImage = ref<PreviewImage>({
+  url: null,
+  info: {
+    width: 0,
+    height: 0,
+    size: 0,
+  },
+});
 
+const fileStore = useFileStore();
 const fileInfo = computed(() => fileStore.selectedFile);
 
 const decrypt = () => {
-  if (previewImageUrl.value) {
-    URL.revokeObjectURL(previewImageUrl.value);
-    previewImageUrl.value = null;
+  if (previewImage.value.url) {
+    URL.revokeObjectURL(previewImage.value.url);
+    previewImage.value.url = null;
+  }
+  if (comparedImage.value.url) {
+    URL.revokeObjectURL(comparedImage.value.url);
+    comparedImage.value.url = null;
   }
 
   if (!fileStore.packBuffer) {
@@ -36,26 +60,27 @@ const decrypt = () => {
   }
 
   try {
-    const data = aesCBCDecrypt();
-    const format = fileInfo.value!.name.split(".").pop()!;
+    const result = getData();
 
-    if (format === "png") {
-      const blob = new Blob([data], { type: "image/png" });
-      previewImageUrl.value = URL.createObjectURL(blob);
+    if (result.type === "image") {
+      const data = result.data.data as ArrayBuffer;
+      const comparedData = result.data.comparedData as ArrayBuffer;
+
+      createImage(data, previewImage);
+      if (!result.same) {
+        createImage(comparedData, comparedImage);
+      }
+
       previewContent.value = null;
-
-      const img = new Image();
-      img.src = URL.createObjectURL(blob);
-      img.onload = () => {
-        imageInfo.value = {
-          width: img.width,
-          height: img.height,
-          size: Math.round(((data as ArrayBuffer).byteLength / 1024) * 100) / 100,
-        };
-      };
     } else {
-      previewContent.value = ["json", "preset"].includes(format) ? JSON.stringify(JSON.parse(data as string), null, 2) : (data as string);
-      previewImageUrl.value = null;
+      const data = result.data.data as string;
+      const comparedData = result.data.comparedData as string;
+      const extension = fileStore.selectedFile!.name!.split(".").pop();
+
+      previewContent.value = ["json", "preset"].includes(extension!) ? JSON.stringify(JSON.parse(data), null, 2) : data;
+      comparedContent.value = ["json", "preset"].includes(extension!) ? JSON.stringify(JSON.parse(comparedData), null, 2) : comparedData;
+      previewImage.value.url = null;
+      comparedImage.value.url = null;
     }
   } catch (error) {
     console.error("Error decrypting file:", error);
@@ -68,9 +93,9 @@ const copyToClipboard = async () => {
   const extension = file?.name.split(".").pop();
 
   if (extension === "png") {
-    if (!previewImageUrl.value) return;
+    if (!previewImage.value.url) return;
 
-    const response = await fetch(previewImageUrl.value);
+    const response = await fetch(previewImage.value.url);
     const blob = await response.blob();
     await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
   } else {
@@ -89,9 +114,9 @@ const downloadFile = async () => {
   const a = document.createElement("a");
 
   if (extension === "png") {
-    if (!previewImageUrl.value) return;
+    if (!previewImage.value.url) return;
 
-    const response = await fetch(previewImageUrl.value);
+    const response = await fetch(previewImage.value.url);
     const blob = await response.blob();
     a.href = URL.createObjectURL(blob);
   } else {
@@ -118,11 +143,8 @@ watch(fileInfo, decrypt);
     </div>
     <div class="preview-content">
       <div v-if="fileInfo" class="preview">
-        <div v-if="previewImageUrl" class="image-preview">
-          <img :src="previewImageUrl" :alt="fileInfo.name" />
-          <span class="image-info">W: {{ imageInfo.width }}px | H: {{ imageInfo.height }}px | Size: {{ imageInfo.size }} Kib</span>
-        </div>
-        <CodeBlock v-else :code="previewContent!" />
+        <ImagePreview v-if="previewImage.url || comparedImage.url" :previewImage="previewImage" :comparedPreviewImage="comparedImage" />
+        <CodeBlock v-if="previewContent && comparedContent" :preview="previewContent" :comparedPreview="comparedContent" :lang="getFileLang(fileInfo.name)" />
       </div>
       <p v-else class="no-files">未選擇文件</p>
     </div>
@@ -134,21 +156,5 @@ watch(fileInfo, decrypt);
   width: 100%;
   height: 100%;
   overflow: auto;
-}
-
-.image-preview {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-}
-
-.image-info {
-  margin-top: 0.5em;
-  opacity: 0.3;
-  flex-direction: column;
-  justify-content: center;
 }
 </style>
