@@ -118,16 +118,12 @@ watch(
 }
 
 .code-wrapper .diff-line {
-  & {
-    display: flex;
-    min-height: 1.5em;
-    line-height: 1.5em;
-  }
+  display: flex;
+  min-height: 1.5em;
+  line-height: 1.5em;
 
   &.diff-added {
-    & {
-      background-color: #0d4429;
-    }
+    background-color: #0d4429;
 
     &.line-content::before {
       content: "+ ";
@@ -137,9 +133,7 @@ watch(
   }
 
   &.diff-removed {
-    & {
-      background-color: #5a1e1e;
-    }
+    background-color: #5a1e1e;
 
     &.line-content::before {
       content: "- ";

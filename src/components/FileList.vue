@@ -49,12 +49,10 @@ onUnmounted(() => {
 
 <style scoped>
 .file-item {
-  & {
-    padding: 0.75rem 1rem;
-    border: 2px solid transparent;
-    border-radius: 10px;
-    background: var(--bg-primary);
-  }
+  padding: 0.75rem 1rem;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  background: var(--bg-primary);
 
   &:hover {
     background: var(--bg-hover);
@@ -72,13 +70,11 @@ onUnmounted(() => {
 }
 
 .file-name {
-  & {
-    margin-bottom: 0.3rem;
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: var(--text-primary);
-    overflow: hidden;
-  }
+  margin-bottom: 0.3rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--text-primary);
+  overflow: hidden;
 
   &.delete {
     color: #d00;

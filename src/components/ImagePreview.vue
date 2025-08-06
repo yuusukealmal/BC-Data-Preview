@@ -35,11 +35,9 @@ console.log(props.comparedPreviewImage);
 
 <style scoped>
 .image-wrapper {
-  & {
-    height: 100%;
-    display: flex;
-    overflow: hidden;
-  }
+  height: 100%;
+  display: flex;
+  overflow: hidden;
 
   div {
     flex: 1;

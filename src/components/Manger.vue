@@ -15,14 +15,12 @@ import PackPreview from "./PackPreview.vue";
 
 <style scoped>
 .wrapper {
-  & {
-    flex: 1;
-    display: flex;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: var(--shadow-lg);
-    background: var(--bg-primary);
-  }
+  flex: 1;
+  display: flex;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  background: var(--bg-primary);
 
   .list-view {
     flex: 1;
