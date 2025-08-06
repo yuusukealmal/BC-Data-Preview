@@ -70,8 +70,9 @@ const decrypt = () => {
       previewContent.value = null;
     } else {
       const data = result.data.data as string;
+      const extension = fileStore.selectedFile!.name!.split(".").pop();
 
-      previewContent.value = ["json", "preset"].includes(fileStore.selectedFile!.name!) ? JSON.stringify(JSON.parse(data), null, 2) : data;
+      previewContent.value = ["json", "preset"].includes(extension!) ? JSON.stringify(JSON.parse(data), null, 2) : data;
       previewImage.value.url = null;
       comparedImage.value.url = null;
     }
