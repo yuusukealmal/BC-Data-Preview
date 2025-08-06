@@ -16,14 +16,14 @@ const addLineNumbers = (html: string): string => {
     .map((line, index) => {
       const lineNumber = index + 1;
       return `<div>
-      <span class="line-number">${lineNumber}</span>
+      <span class="diff-line-number">${lineNumber}</span>
       <span class="line-content">${line || " "}</span>
     </div>`;
     })
     .join("");
 
   code.innerHTML = numberedLines;
-  pre.classList.add("with-line-numbers");
+  pre.classList.add("with-diff-line-numbers");
 
   return wrapper.innerHTML;
 };
@@ -72,8 +72,8 @@ export const renderDiffHtml = (diffLines: FileDiffLines[], highlighter: Highligh
       const newLineNum = line.newLineNum ? line.newLineNum.toString() : "";
 
       return `<div class="diff-line diff-${line.type}">
-      <span class="line-number old-line-num">${oldLineNum}</span>
-      <span class="line-number new-line-num">${newLineNum}</span>
+      <span class="diff-line-number old-line-num">${oldLineNum}</span>
+      <span class="diff-line-number new-line-num">${newLineNum}</span>
       <span class="line-content">${codeContent}</span>
     </div>`;
     })

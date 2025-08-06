@@ -91,11 +91,11 @@ watch(
   font-family: inherit;
 }
 
-.code-wrapper .line-number {
+.code-wrapper .diff-line-number {
   width: 3em;
   padding: 0 8px;
   text-align: right;
-  color: #7d8590;
+  color: var(--diff-line-number);
   user-select: none;
 }
 
@@ -106,11 +106,11 @@ watch(
 }
 
 .code-wrapper .old-line-num {
-  background-color: var(--old-line-number-background);
+  background-color: var(--old-diff-line-number-background);
   border-right: 1px solid #30363d;
 }
 .code-wrapper .new-line-num {
-  background-color: var(--new-line-number-background);
+  background-color: var(--new-diff-line-number-background);
   border-right: 1px solid #30363d;
 }
 

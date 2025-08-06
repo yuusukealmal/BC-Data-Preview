@@ -16,12 +16,13 @@
   --diff-line-remove-background: #ffeef0;
   --diff-line-add-background: #e6ffed;
   --diff-before-mark-color: #24292e;
-  --old-line-number-background: #e1e4e8;
-  --new-line-number-background: #ffffff;
+  --old-diff-line-number-background: #e1e4e8;
+  --new-diff-line-number-background: #ffffff;
+  --diff-line-number: #858b91;
 }
 
 .dark {
-  --bg-primary: #1a1a1a;
+  --bg-primary: #24292e;
   --bg-secondary: #2d2d2d;
   --text-primary: #ffffff;
   --text-secondary: #b0b0b0;
@@ -37,8 +38,9 @@
   --diff-line-remove-background: #450c0f;
   --diff-line-add-background: #113a1b;
   --diff-before-mark-color: #f6f8fa;
-  --old-line-number-background: #2f363d;
-  --new-line-number-background: #1d2125;
+  --old-diff-line-number-background: #2f363d;
+  --new-diff-line-number-background: #1d2125;
+  --diff-line-number: #80888f;
 }
 
 * {
