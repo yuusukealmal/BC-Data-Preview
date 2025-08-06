@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from "vue";
 
-import type { ImageInfo, PreviewImage } from "../types";
+import type { PreviewImage } from "../types";
+
 import { useFileStore } from "../store/fileStore";
+
 import { getData } from "../utils/crypto/decrypt";
 import { createImage } from "../utils/imageCreate";
+import { getFileLang } from "../utils/diff/lang";
 
 import ImagePreview from "./ImagePreview.vue";
 import CodeBlock from "./CodeBlock.vue";
@@ -19,6 +22,7 @@ onUnmounted(() => {
 });
 
 const previewContent = ref<string | null>(null);
+const comparedContent = ref<string | null>(null);
 const previewImage = ref<PreviewImage>({
   url: null,
   info: {
@@ -70,9 +74,11 @@ const decrypt = () => {
       previewContent.value = null;
     } else {
       const data = result.data.data as string;
+      const comparedData = result.data.comparedData as string;
       const extension = fileStore.selectedFile!.name!.split(".").pop();
 
       previewContent.value = ["json", "preset"].includes(extension!) ? JSON.stringify(JSON.parse(data), null, 2) : data;
+      comparedContent.value = ["json", "preset"].includes(extension!) ? JSON.stringify(JSON.parse(comparedData), null, 2) : comparedData;
       previewImage.value.url = null;
       comparedImage.value.url = null;
     }
@@ -138,7 +144,7 @@ watch(fileInfo, decrypt);
     <div class="preview-content">
       <div v-if="fileInfo" class="preview">
         <ImagePreview v-if="previewImage.url || comparedImage.url" :previewImage="previewImage" :comparedPreviewImage="comparedImage" />
-        <CodeBlock v-else :code="previewContent!" />
+        <CodeBlock v-if="previewContent && comparedContent" :preview="previewContent" :comparedPreview="comparedContent" :lang="getFileLang(fileInfo.name)" />
       </div>
       <p v-else class="no-files">未選擇文件</p>
     </div>

@@ -29,3 +29,11 @@ export type LabeledFile = {
   info: FileInfo;
   label: FileStatus;
 };
+
+type FileDiffType = "unchanged" | "added" | "removed";
+export interface FileDiffLines {
+  type: FileDiffType;
+  content: string;
+  oldLineNum: number | null;
+  newLineNum: number | null;
+}

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, provide, ref } from "vue";
 
 import { versions } from "../config/versions";
 
@@ -25,6 +25,8 @@ onMounted(() => {
 });
 
 const isDark = ref(false);
+provide("isDark", isDark);
+
 const fileStore = useFileStore();
 
 const countryMap = {
