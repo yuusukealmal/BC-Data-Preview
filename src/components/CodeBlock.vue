@@ -83,20 +83,31 @@ watch(
 </script>
 
 <template>
-  <div class="counter-wrapper">
-    <span class="file-name">{{ fileInfo?.name }}</span>
-    <span class="diff-add-count" ref="diffAddCount"></span>
-    <span class="diff-remove-count" ref="diffRemoveCount"></span>
+  <div class="codeblock-container">
+    <div class="counter-wrapper">
+      <span class="file-name">{{ fileInfo?.name }}</span>
+      <span class="diff-add-count" ref="diffAddCount"></span>
+      <span class="diff-remove-count" ref="diffRemoveCount"></span>
+    </div>
+    <div ref="highlightedHtml" class="code-wrapper" />
   </div>
-  <div ref="highlightedHtml" class="code-wrapper" />
 </template>
 
 <style>
+.codeblock-container {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 .counter-wrapper {
-  padding: 0 8px 4px 8px;
+  position: sticky;
+  padding: 8px;
   display: flex;
   align-items: center;
   font-size: 16px;
+  border: 1px solid var(--border-color);
 }
 
 .counter-wrapper span {
@@ -114,6 +125,7 @@ watch(
 
 .code-wrapper {
   font-size: 14px;
+  overflow: auto;
 }
 
 .code-wrapper pre {

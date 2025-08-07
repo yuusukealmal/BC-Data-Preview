@@ -163,6 +163,10 @@ watch(fileInfo, decrypt);
 </template>
 
 <style scoped>
+.preview-content {
+  padding: 0;
+}
+
 .preview {
   width: 100%;
   height: 100%;

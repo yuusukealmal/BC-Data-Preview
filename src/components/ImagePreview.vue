@@ -3,7 +3,7 @@ import { computed, type PropType } from "vue";
 import { useFileStore } from "../store/fileStore";
 import type { PreviewImage } from "../types";
 
-const props = defineProps({
+defineProps({
   previewImage: {
     type: Object as PropType<PreviewImage>,
     required: true,
@@ -16,8 +16,6 @@ const props = defineProps({
 
 const fileStore = useFileStore();
 const fileInfo = computed(() => fileStore.selectedFile);
-console.log(props.previewImage);
-console.log(props.comparedPreviewImage);
 </script>
 
 <template>
