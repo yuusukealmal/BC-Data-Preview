@@ -102,7 +102,6 @@ watch(
 }
 
 .counter-wrapper {
-  position: sticky;
   padding: 8px;
   display: flex;
   align-items: center;
