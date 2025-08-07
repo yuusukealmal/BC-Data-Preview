@@ -19,6 +19,8 @@
   --old-diff-line-number-background: #e1e4e8;
   --new-diff-line-number-background: #ffffff;
   --diff-line-number: #858b91;
+  --diff-line-count-add-color: #22863a;
+  --diff-line-count-remove-color: #cb2431;
 }
 
 .dark {
@@ -41,12 +43,15 @@
   --old-diff-line-number-background: #2f363d;
   --new-diff-line-number-background: #1d2125;
   --diff-line-number: #80888f;
+  --diff-line-count-add-color: #277b32;
+  --diff-line-count-remove-color: #d73a49;
 }
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 body {

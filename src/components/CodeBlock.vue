@@ -6,6 +6,7 @@ import { createHighlighter, type BundledLanguage, type BundledTheme, type Highli
 import { countDiffLines } from "../utils/diff/lineCount";
 import { renderDefault, renderDiffHtml, renderHtml } from "../utils/diff/diffCreator";
 import { langs } from "../utils/diff/lang";
+import { useFileStore } from "../store/fileStore";
 
 const props = defineProps({
   preview: {
@@ -26,6 +27,12 @@ const isDark = inject<Ref<boolean>>("isDark");
 const currentTheme = computed(() => (isDark!.value ? "github-dark" : "github-light"));
 
 const highlightedHtml = ref<HTMLDivElement | null>(null);
+const diffAddCount = ref<HTMLSpanElement | null>(null);
+const diffRemoveCount = ref<HTMLSpanElement | null>(null);
+
+const fileStore = useFileStore();
+const fileInfo = computed(() => fileStore.selectedFile);
+
 let highlighter: HighlighterGeneric<BundledLanguage, BundledTheme> | null = null;
 
 const highlight = async () => {
@@ -41,7 +48,9 @@ const highlight = async () => {
     }
     if (props.preview && props.comparedPreview) {
       const diffLines = countDiffLines(props.preview, props.comparedPreview);
-      highlightedHtml.value!.innerHTML = renderDiffHtml(diffLines, highlighter, props.lang, currentTheme.value);
+      highlightedHtml.value!.innerHTML = renderDiffHtml(diffLines.lines, highlighter, props.lang, currentTheme.value);
+      diffAddCount.value!.innerText = `+${diffLines.total.added}`;
+      diffRemoveCount.value!.innerText = `-${diffLines.total.removed}`;
     } else if (props.preview) {
       highlightedHtml.value!.innerHTML = renderHtml(highlighter, props.preview, props.lang, currentTheme.value);
     } else {
@@ -74,10 +83,35 @@ watch(
 </script>
 
 <template>
+  <div class="counter-wrapper">
+    <span class="file-name">{{ fileInfo?.name }}</span>
+    <span class="diff-add-count" ref="diffAddCount"></span>
+    <span class="diff-remove-count" ref="diffRemoveCount"></span>
+  </div>
   <div ref="highlightedHtml" class="code-wrapper" />
 </template>
 
 <style>
+.counter-wrapper {
+  padding: 0 8px 4px 8px;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+}
+
+.counter-wrapper span {
+  margin-right: 12px;
+}
+.counter-wrapper .file-name {
+  opacity: 0.7;
+}
+.counter-wrapper .diff-add-count {
+  color: var(--diff-line-count-add-color);
+}
+.counter-wrapper .diff-remove-count {
+  color: var(--diff-line-count-remove-color);
+}
+
 .code-wrapper {
   font-size: 14px;
 }
@@ -128,7 +162,6 @@ watch(
 .code-wrapper .file-line.diff-added .line-content::before {
   content: "+ ";
   color: var(--diff-before-mark-color);
-  font-weight: bold;
   opacity: 0.7;
 }
 
@@ -138,7 +171,6 @@ watch(
 .code-wrapper .file-line.diff-removed .line-content::before {
   content: "- ";
   color: var(--diff-before-mark-color);
-  font-weight: bold;
   opacity: 0.7;
 }
 

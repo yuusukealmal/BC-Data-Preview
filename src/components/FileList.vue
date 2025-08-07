@@ -72,7 +72,6 @@ onUnmounted(() => {
 .file-name {
   margin-bottom: 0.3rem;
   font-size: 1.2rem;
-  font-weight: bold;
   color: var(--text-primary);
   overflow: hidden;
 

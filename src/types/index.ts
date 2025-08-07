@@ -31,9 +31,18 @@ export type LabeledFile = {
 };
 
 type FileDiffType = "unchanged" | "added" | "removed";
-export interface FileDiffLines {
+export interface LineDiff {
   type: FileDiffType;
   content: string;
   oldLineNum: number | null;
   newLineNum: number | null;
+}
+interface LineCount {
+  added: number;
+  removed: number;
+}
+
+export interface DiffCounts {
+  total: LineCount;
+  lines: LineDiff[];
 }

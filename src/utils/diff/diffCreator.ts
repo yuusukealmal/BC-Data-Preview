@@ -1,5 +1,5 @@
 import type { HighlighterGeneric, BundledLanguage, BundledTheme } from "shiki";
-import type { FileDiffLines } from "../../types";
+import type { LineDiff } from "../../types";
 
 const addLineNumbers = (html: string): string => {
   const wrapper = document.createElement("div");
@@ -53,7 +53,7 @@ export const renderHtml = (highlighter: HighlighterGeneric<BundledLanguage, Bund
   }
 };
 
-export const renderDiffHtml = (diffLines: FileDiffLines[], highlighter: HighlighterGeneric<BundledLanguage, BundledTheme> | null, lang: string, theme: string) => {
+export const renderDiffHtml = (diffLines: LineDiff[], highlighter: HighlighterGeneric<BundledLanguage, BundledTheme> | null, lang: string, theme: string) => {
   if (!highlighter) return renderDefault(highlighter, theme);
 
   const diffHtml = diffLines

@@ -150,7 +150,6 @@ watch(fileInfo, decrypt);
       <div v-if="fileInfo" class="detail-info">
         <i class="bi bi-clipboard-fill copy-icon" @click="copyToClipboard">複製</i>
         <i class="bi bi-download download-icon" @click="downloadFile">下載</i>
-        <span>當前選擇: {{ fileInfo.name }}</span>
       </div>
     </div>
     <div class="preview-content">
